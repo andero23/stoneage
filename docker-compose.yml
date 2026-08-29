@@ -1,0 +1,26 @@
+# The Winter Count — testiring
+# Käivitus serveris: ADMIN_KEY=salajane docker compose up -d --build
+services:
+  game:
+    build: ./game
+    restart: unless-stopped
+    environment:
+      - ADMIN_KEY=${ADMIN_KEY:-muuda-mind}
+    volumes:
+      - game-data:/app/data
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  game-data:
+  caddy-data:
+  caddy-config:

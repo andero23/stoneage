@@ -1,0 +1,7 @@
+thewintercount.com {
+	reverse_proxy game:8125
+}
+
+www.thewintercount.com {
+	redir https://thewintercount.com{uri} permanent
+}
