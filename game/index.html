@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+<meta charset="utf-8">
+<title>Kiviaeg — jääda või liikuda</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/style.css?v=11">
+</head>
+<body>
+<div id="app">
+  <!-- Top bar -->
+  <div id="topbar">
+    <div class="tb-group" id="tb-date">
+      <span id="date-txt">1. suvi, 1. aasta</span>
+      <span id="day-txt" class="dim">päev 1/30</span>
+    </div>
+    <div class="tb-group" id="tb-speed">
+      <button class="spd" data-spd="0" title="Paus (tühik)">❚❚</button>
+      <button class="spd" data-spd="1" title="Tavaline kiirus">▶</button>
+      <button class="spd" data-spd="2" title="Kahekordne">▶▶</button>
+      <button class="spd" data-spd="4" title="Neljakordne">▶▶▶</button>
+    </div>
+    <div class="tb-group" id="tb-res">
+      <span class="res" id="res-toit" title="Värske toit rikneb ~6 päevaga. Kuivatatud säilib talve.">🍖 <b id="r-fresh">0</b> <span class="dim">+</span> <b id="r-dried">0</b><span class="dim">kuiv</span></span>
+      <span class="res" id="res-mat" title="Materjal: puit, kivi, luu. Vajalik ehitisteks ja tööriistadeks.">🪵 <b id="r-mat">0</b></span>
+      <span class="res" id="res-hides" title="Nahad tulevad ainult jahilt. Vajalikud talveriieteks.">🦌 <b id="r-hides">0</b></span>
+      <span class="res" id="res-clothes" title="Talveriided: mitu inimest on riietatud / kokku">🧥 <b id="r-clothes">0/0</b></span>
+      <span class="res" id="res-tool" title="Tööriistade kvaliteet. Meister hoiab korras, töökoht tõstab lage.">⚒ <b id="r-tool">0</b></span>
+      <span class="res" id="res-gear" title="">⚔ <b id="r-gear">0</b></span>
+    </div>
+    <div class="tb-group" id="tb-meters">
+      <div class="meter" id="m-sec" title=""><label>Turvatunne</label><div class="bar"><div class="fill sec"></div><div class="req"></div></div><span class="mval"></span></div>
+      <div class="meter" id="m-faith" title="Usk on puhver raskuste vastu: kõrge usuga talutakse nälga ja surma ilma lahkumata."><label>Usk</label><div class="bar"><div class="fill faith"></div></div><span class="mval"></span></div>
+      <div class="meter" id="m-rep" title="Maine määrab, kes tuleb: liitujad, kauplejad… või röövlid."><label>Maine</label><div class="bar"><div class="fill rep"></div></div><span class="mval"></span></div>
+      <div class="meter" id="m-vis" title=""><label>Nähtavus</label><div class="bar"><div class="fill vis"></div></div><span class="mval"></span></div>
+    </div>
+    <div class="tb-group" id="tb-pop">
+      <span id="pop-txt" title="Rahvaarv">👥 <b id="r-pop">0</b></span>
+      <span id="leave-txt" title="Lahkumise hind: mis jääb maha, kui kolite. Iga ehitis tõstab seda.">⚓ <b id="r-leave">0</b></span>
+      <span id="score-txt" title="Skoor koguneb iga elatud hooajaga: rahvaarv, varad, reliikviad, üle elatud talved, võidetud sõjaretked. Surm lõpetab kogumise.">🏆 <b id="r-score">0</b></span>
+      <button id="btn-feedback" title="Saada tagasisidet">💬</button>
+    </div>
+  </div>
+
+  <!-- Main area -->
+  <div id="main">
+    <div id="canvas-wrap">
+      <canvas id="game-canvas" width="960" height="600"></canvas>
+      <div id="log-overlay"></div>
+      <div id="ring-overlay" title="Ümbruse rikkus ringide kaupa. Kui ring tühjeneb, käivad töölised kaugemal: aeglasem ja ohtlikum.">
+        <div class="ringbar" id="rb-0"><label>Ring 1</label><div class="rbar"><div class="rfill"></div></div></div>
+        <div class="ringbar" id="rb-1"><label>Ring 2</label><div class="rbar"><div class="rfill"></div></div></div>
+        <div class="ringbar" id="rb-2"><label>Ring 3</label><div class="rbar"><div class="rfill"></div></div></div>
+      </div>
+      <div id="away-overlay"></div>
+    </div>
+
+    <!-- Side panel -->
+    <div id="side">
+      <div id="tabs">
+        <button class="tab active" data-tab="rahvas">Rahvas</button>
+        <button class="tab" data-tab="kyla">Küla</button>
+        <button class="tab" data-tab="teod">Teod</button>
+        <button class="tab" data-tab="kaart">Kaart</button>
+      </div>
+      <div id="tab-rahvas" class="tabpage active"></div>
+      <div id="tab-kyla" class="tabpage"></div>
+      <div id="tab-teod" class="tabpage"></div>
+      <div id="tab-kaart" class="tabpage"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="modal-back" class="hidden">
+  <div id="modal">
+    <h2 id="modal-title"></h2>
+    <div id="modal-body"></div>
+    <div id="modal-choices"></div>
+  </div>
+</div>
+
+<!-- Combat overlay -->
+<div id="combat-back" class="hidden">
+  <div id="combat-box">
+    <h2 id="combat-title">Kokkupõrge</h2>
+    <canvas id="combat-canvas" width="780" height="480"></canvas>
+    <div id="combat-info"></div>
+    <div id="combat-buttons">
+      <button id="cb-endturn">Käik läbi</button>
+      <button id="cb-flee" title="Kõik põgenevad. Kaotad saaki ja mainet, aga mitte inimesi.">Põgene</button>
+      <button id="cb-auto" title="Lase lahingul ise laheneda.">Lahenda ise</button>
+    </div>
+    <div id="combat-log"></div>
+  </div>
+</div>
+
+<!-- Start screen -->
+<div id="start-back">
+  <div id="start-box">
+    <h1>KIVIAEG</h1>
+    <p class="subtitle">jääda või liikuda</p>
+    <p id="start-record" class="dim" style="margin-bottom:10px"></p>
+    <p class="intro">Teid on viis. Teil ei ole tööriistu ega riideid, ainult tuli ja üksteise nimed.
+    Suvi on lahke, aga suvi valetab. Hoia oma rühm elus läbi aastaaegade ja otsusta,
+    millal jätta maha koht, mille sa ise üles ehitasid.</p>
+    <button id="btn-new">Uus mäng</button>
+    <button id="btn-continue" class="hidden">Jätka mängu</button>
+    <button id="btn-help2">Kuidas mängida?</button>
+  </div>
+</div>
+
+<script src="js/telemetry.js?v=11"></script>
+<script src="js/util.js?v=11"></script>
+<script src="js/data.js?v=11"></script>
+<script src="js/sprites.js?v=11"></script>
+<script src="js/world.js?v=11"></script>
+<script src="js/person.js?v=11"></script>
+<script src="js/sim.js?v=11"></script>
+<script src="js/events.js?v=11"></script>
+<script src="js/combat.js?v=11"></script>
+<script src="js/render.js?v=11"></script>
+<script src="js/bot.js?v=11"></script>
+<script src="js/ui.js?v=11"></script>
+<script src="js/admin.js?v=11"></script>
+<script src="js/main.js?v=11"></script>
+</body>
+</html>
