@@ -232,3 +232,10 @@ b { color: #fff; }
 #fb-box textarea { width: 100%; background: var(--bg); color: var(--txt);
   border: 1px solid var(--border); border-radius: 3px; font-family: inherit; padding: 6px; }
 #fb-box .fb-btns { display: flex; gap: 8px; margin-top: 10px; }
+
+/* Edenemisribad (ehitus, riided, varustus) */
+.progrow { display: flex; align-items: center; gap: 6px; margin: 3px 0 3px 2px; font-size: 11px; }
+.progrow .plabel { flex: 0 0 110px; color: var(--txt); }
+.progrow .pbar { flex: 1; height: 8px; background: #0b0805; border: 1px solid var(--border); display: block; }
+.progrow .pfill { height: 100%; background: var(--accent); display: block; }
+.progrow .pval { flex: 0 0 74px; text-align: right; color: var(--dim); }

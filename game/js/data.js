@@ -15,10 +15,14 @@ const DATA = {
   RING_SHARE: [0.40, 0.35, 0.25],
   TU_PER_POINT: 30,         // 1 ammendumispunkt = 30 TÜ
 
-  // TÜ/päevas, suvi, ring 1, oskus 0..3
+  // Päeva saak kõigub ±YIELD_VAR: metsas ei ole tabelit. Keskmine jääb samaks,
+  // aga mängija ei saa täpseid numbreid välja arvutada — ja ei peagi.
+  YIELD_VAR: 0.18,
+
+  // TÜ/päevas, suvi, ring 1, oskus 0..3 (KESKMINE — mängijale ei näidata)
   YIELD: {
     marjad: [1.5, 1.9, 2.3, 2.6],
-    seened: [1.2, 2.0, 2.8, 3.6],
+    seened: [1.8, 2.2, 2.9, 3.6], // pahmakas korraga: alati marjadest rohkem, aga mürgioht
     juured: [0.9, 1.1, 1.3, 1.5],
     kala:   [1.8, 2.4, 3.0, 3.6],
     jaht:   [1.0, 2.0, 3.2, 4.5],  // oodatav keskmine; tuleb pahmakatena
@@ -35,10 +39,14 @@ const DATA = {
 
   // mürgitus: [risk/päev oskuse 0..3 järgi]
   POISON: {
-    seened: { risk: [0.06, 0.03, 0.012, 0.004], days: [4, 8], death: 0.12, deathShaman: 0.04 },
+    seened: { risk: [0.06, 0.03, 0.012, 0.004], days: [4, 8], death: 0.05, deathShaman: 0.015 },
     marjad: { risk: [0.015, 0.008, 0.004, 0.002], days: [2, 3], death: 0, deathShaman: 0 },
     juured: { risk: [0.01, 0.006, 0.003, 0.001], days: [2, 4], death: 0, deathShaman: 0 },
   },
+
+  // Mürgitus tapab nõrga, mitte tugeva: kordaja tervise järgi (100 → ×0,5, 50 → ×1,0, 20 → ×1,3).
+  // Nii on seened hooldatud rahvaga risk, hooldamata rahvaga hukatus — ja mängijal on kontroll.
+  POISON_HEALTH_MULT: h => U.clamp(1.5 - h / 100, 0.5, 1.3),
 
   FRESH_LIFE: 6,            // värske toit rikneb ~6 päevaga
   FRESH_LIFE_WINTER: 12,    // külm hoiab kauem

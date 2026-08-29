@@ -181,7 +181,7 @@ const UI = {
     this.queueModal({
       title: "Kuidas mängida",
       body:
-        "AEG: 1 päev = 15 s. Aasta = 4 hooaega à 30 päeva. Talv jookseb ise 4× kiirusel.\n\n" +
+        "AEG: 1 päev = 15 s. Aasta = 4 hooaega à 30 päeva. Kiirust valid ise (1/2/3 või nupud) — ka talvel jätkub tööd: ehitamine, materjal, juured, talvejaht.\n\n" +
         "TOIT: iga täiskasvanu sööb 1 TÜ päevas, laps pool. Värske toit rikneb ~6 päevaga. Kuivatusraam + keegi kuivatamas = talvevaru.\n\n" +
         "AMMENDUMINE: iga laagripaik on piiratud. Ring 1 tühjeneb esimesena, siis käiakse kaugemal (ring 2–3): aeglasem, ohtlikum, ja rünnaku ajal on need inimesed kodust ära. Mujal maa taastub aegamisi.\n\n" +
         "OSKUSED: töö õpetab. Kaugemal töötamine õpetab kiiremini (ring 2 = 2×, ring 3 = 3×, uus laagripaik = 3× esimesel hooajal). Mugav elu ei õpeta. Kogenu + algaja samas ametis = õpipaar.\n\n" +
@@ -385,7 +385,15 @@ const UI = {
             if (p.mode === mk) o.selected = true;
             msel.appendChild(o);
           }
-          msel.title = "Marjad: ohutu, vähe. Seened: palju ja kuivatatav, aga mürgioht (oskus aitab). Juured: talvel ainus korilus. Materjal: ehituseks. Kuivatab: värske → kuivatatud (vajab raami).";
+          const kl = Person.skill(p, "kor");
+          const pr = Math.round(DATA.POISON.seened.risk[kl] * 100 * 10) / 10;
+          const dp = (Sim.hasShaman() ? DATA.POISON.seened.deathShaman : DATA.POISON.seened.death) * DATA.POISON_HEALTH_MULT(p.health);
+          const dr = Math.round((1 - Math.pow(1 - DATA.POISON.seened.risk[kl] * dp, 30)) * 100);
+          msel.title = "Marjad: ohutu ja etteaimatav.\n" +
+            "Seened: toovad rohkem kui marjad, aga MÜRGIOHT — " + pr + "% päevas, " +
+            "surmarisk hooaja jooksul ~" + dr + "%" + (Sim.hasShaman() ? " (šamaan ravib)" : " (ilma šamaanita!)") +
+            ". Oskus vähendab riski järsult; nõrk inimene sureb mürgist kergemini kui terve.\n" +
+            "Juured: talvel ainus korilus. Materjal: ehituseks ja erileidudeks. Kuivatab: värske → kuivatatud (vajab raami).";
           msel.addEventListener("change", () => { p.mode = msel.value; this.refreshAll(true); });
           ctrl.appendChild(msel);
         }
@@ -448,8 +456,17 @@ const UI = {
 
     html += '<div class="sechead">Ehitised</div>';
     if (G.buildQueue.length) {
-      html += '<div class="buildq">Ehitamisel: ' + G.buildQueue.map(b => DATA.BUILDINGS[b.key].name + " (" + Math.ceil(b.workLeft) + " tp)").join(", ") +
-        (Sim.adults().some(p => p.job === "meister" && Person.canWork(p)) ? "" : " — <span style='color:var(--danger)'>VAJA ON MEISTRIT!</span>") + "</div>";
+      const hasM = Sim.adults().some(p => p.job === "meister" && Person.canWork(p));
+      html += '<div class="buildq">Ehitamisel:' +
+        (hasM ? "" : " <span style='color:var(--danger)'>VAJA ON MEISTRIT!</span>") + "</div>";
+      G.buildQueue.forEach((b, i) => {
+        const total = DATA.BUILDINGS[b.key].work;
+        const done = U.clamp((total - b.workLeft) / total, 0, 1);
+        html += '<div class="progrow"><span class="plabel">' + DATA.BUILDINGS[b.key].name +
+          (i > 0 ? " <span class='dim'>(ootel)</span>" : "") + '</span>' +
+          '<span class="pbar"><span class="pfill" style="width:' + Math.round(done * 100) + '%"></span></span>' +
+          '<span class="pval">' + Math.round(done * 100) + "% · " + Math.ceil(b.workLeft) + " tp</span></div>";
+      });
     }
     for (const key in DATA.BUILDINGS) {
       const def = DATA.BUILDINGS[key];
@@ -463,14 +480,26 @@ const UI = {
     html += '<div class="sechead">Talveriided</div>';
     html += '<div class="bldrow"><div class="bhead"><span class="bname">Riietatud: ' + Sim.alive().filter(p => p.clothed).length + "/" + Sim.pop() + "</span>" +
       '<button class="bbtn" id="btn-clothes">Õmble (' + DATA.CLOTHES_HIDES + ' nahka)</button></div>' +
-      '<div class="bdesc">Meister õmbleb komplekti ' + DATA.CLOTHES_WORK + " tööpäevaga. Ilma meistrita tehakse seda õhtuti, palju aeglasemalt. Järjekorras: " + G.clothQueue + ". Riieteta inimene külmub talvel.</div></div>";
+      '<div class="bdesc">Meister õmbleb komplekti ' + DATA.CLOTHES_WORK + " tööpäevaga. Ilma meistrita tehakse seda õhtuti, palju aeglasemalt. Järjekorras: " + G.clothQueue + ". Riieteta inimene külmub talvel.</div>" +
+      (G.clothQueue > 0 ? '<div class="progrow"><span class="plabel">Talveriided</span>' +
+        '<span class="pbar"><span class="pfill" style="width:' + Math.round(U.clamp(G.clothProgress / DATA.CLOTHES_WORK, 0, 1) * 100) + '%"></span></span>' +
+        '<span class="pval">' + Math.round(U.clamp(G.clothProgress / DATA.CLOTHES_WORK, 0, 1) * 100) + '%</span></div>' : "") + "</div>";
 
     // sõjavarustus
     html += '<div class="sechead">Sõjavarustus</div>';
     html += '<div class="bldrow"><div class="bhead"><span class="bname">Relvi: ' + Sim.gearCount("relv") + " · turviseid: " + Sim.gearCount("turvis") + '</span></div>' +
       '<div class="bdesc">Leiud ootel: <b>' + G.finds.flint + '</b> erilist kivi (kaugemalt materjalikorjelt), <b>' + G.finds.bone + '</b> suurt luud (suurjahilt, suursaagilt). ' +
       "Varustus kulub lahingus (" + DATA.GEAR.WEAR_PER_FIGHT + "/lahing) — pidev hankimine on paratamatus." +
-      (G.gearQueue.length ? " Töös: " + G.gearQueue.map(q => q.kind).join(", ") + "." : "") + "</div>" +
+      "</div>" +
+      (G.gearQueue.length ? (function(){
+        const q = G.gearQueue[0];
+        const need = q.kind === "relv" ? DATA.GEAR.WEAPON.work : DATA.GEAR.ARMOR.work;
+        const d = U.clamp(G.gearProgress / need, 0, 1);
+        return '<div class="progrow"><span class="plabel">' + (q.kind === "relv" ? "Relv" : "Turvis") +
+          (G.gearQueue.length > 1 ? " <span class='dim'>(+" + (G.gearQueue.length - 1) + ")</span>" : "") + '</span>' +
+          '<span class="pbar"><span class="pfill" style="width:' + Math.round(d * 100) + '%"></span></span>' +
+          '<span class="pval">' + Math.round(d * 100) + '%</span></div>';
+      })() : "") +
       '<div class="bcost"><button id="btn-gear-relv">Sepista relv (1 kivileid + 2 mat, 2 tp)</button> ' +
       '<button id="btn-gear-turvis">Turvis (2 luud + 2 nahka, 3 tp)</button></div></div>';
 

@@ -86,6 +86,9 @@ const Sim = {
   hasShaman() { return this.adults().some(p => p.job === "samaan" && Person.canWork(p) && !p.away); },
   toolBonus() { return 1 + DATA.TOOL_BONUS_MAX * (G.tool / 100); },
 
+  // päeva saagikõikumine: mõni päev on marju rohkem, mõni päev vähem
+  yieldRoll() { return U.rf(1 - DATA.YIELD_VAR, 1 + DATA.YIELD_VAR); },
+
   // Kohatundmine: kaua ühes paigas elades teatakse, kus marjad kasvavad ja kus kala
   // seisab. Uus koht õpetab oskust (kogemus), vana koht annab kohatundmise — kaks
   // eri asja, mõlemal oma väärtus.
@@ -322,7 +325,7 @@ const Sim = {
       if (job === "korilane") {
         this.workGather(p, lvl, ring, rm, extracted);
       } else if (job === "kalur") {
-        let y = DATA.YIELD.kala[lvl] * DATA.SEASON_MOD.kala[G.season] * rm;
+        let y = DATA.YIELD.kala[lvl] * DATA.SEASON_MOD.kala[G.season] * rm * this.yieldRoll();
         if (!site.river) y *= 0.35;
         if (site.fishRun && G.season === 0) y *= 1.5;
         y *= this.buffMod("kalaonn", 1.12);
@@ -382,7 +385,7 @@ const Sim = {
     const mode = p.mode;
     if (mode === "kuivatab") return; // kuivatusfaasis
     if (mode === "materjal") {
-      const y = DATA.YIELD.materjal[lvl] * [0.8, 1, 1, 0.5][G.season] * rm;
+      const y = DATA.YIELD.materjal[lvl] * [0.8, 1, 1, 0.5][G.season] * rm * this.yieldRoll();
       G.mat += y;
       // eriline kivi: kaugemal harv, aga võimalik
       if (U.chance(DATA.GEAR.FIND_P[ring])) {
@@ -392,7 +395,7 @@ const Sim = {
       return;
     }
     const smod = mode === "juured" ? DATA.SEASON_MOD.juured[G.season] : DATA.SEASON_MOD.korilus[G.season];
-    let y = DATA.YIELD[mode][lvl] * smod * rm;
+    let y = DATA.YIELD[mode][lvl] * smod * rm * this.yieldRoll();
     this.addFresh(y);
     extracted[ring] += y;
     G.seasonGain += y;
@@ -1144,7 +1147,7 @@ const Sim = {
     const days = U.ri(poi.days[0], poi.days[1]);
     p.sick = { name: mode + "mürgitus", days };
     p.away = null;
-    const deathP = this.hasShaman() ? poi.deathShaman : poi.death;
+    const deathP = (this.hasShaman() ? poi.deathShaman : poi.death) * DATA.POISON_HEALTH_MULT(p.health);
     if (U.chance(deathP)) {
       this.killPerson(p, "seenemürgitus");
       this.log("Vale seen. " + p.name + " ei ärganud hommikul enam üles.", "bad");
@@ -1358,8 +1361,7 @@ const Sim = {
       this.log("SÜGIS. Otsustav aeg: varuda, kuivatada, ehitada — või kolida (aken lahti 15 päeva).", "evt");
     } else if (s === 3) {
       Events.scheduleWinter();
-      G.speed = Math.max(G.speed, 4);
-      this.log("TALV. Nüüd makstakse sügiseste otsuste eest. Aeg jookseb kiiremini (4×).", "evt");
+      this.log("TALV. Nüüd makstakse sügiseste otsuste eest — aga tööd jätkub: ehitamine, materjal, juured, talvejaht.", "evt");
       const cap = this.shelterCap();
       if (cap < this.pop()) this.log("HOIATUS: peavarju on " + cap + " inimesele, teid on " + this.pop() + ". Väljas magajad külmuvad.", "bad");
       const unclothed = this.alive().filter(p => !p.clothed).length;
