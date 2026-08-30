@@ -41,18 +41,19 @@ const NAMES = {
       "Sula", "Kaste", "Uneli", "Hela", "Villu"],
 };
 
-// nimepoolid omaduste järgi: jõekohad, koopakohad, muud
+// nimepoolid omaduste järgi: jõekohad, koopakohad, muud.
+// Kohanimed on kirjeldavad — nimi ise on mängijale vihje koha kohta.
 const SITE_NAMES = {
-  river: ["Jõesuu", "Pärlijõgi", "Havikari", "Kärestiku", "Luhaoja", "Kalasoon"],
-  cave: ["Kaldakoobas", "Hallikivi", "Karukoobas", "Kivivarju"],
-  plain: ["Soosaar", "Tammiku", "Luhasoo", "Kuresoo", "Põhjanõmm", "Kivineem"],
+  river: ["River Mouth", "Pearl River", "Pike Shoal", "The Rapids", "Meadow Brook", "Fish Narrows"],
+  cave: ["Shore Cave", "Grey Stone", "Bear Cave", "Stone Shelter"],
+  plain: ["Bog Island", "Oak Stand", "Meadow Fen", "Crane Bog", "North Heath", "Stone Point"],
 };
 
-const NEIGHBOR_NAMES = ["Jõerahvas", "Põdrarahvas", "Kivirahvas", "Tuulerahvas", "Soorahvas"];
+const NEIGHBOR_NAMES = ["River Folk", "Elk Folk", "Stone Folk", "Wind Folk", "Bog Folk"];
 
 // kauged hõimud, kes genereeritakse kohtumise hetkel (neid ei simuleerita taustal)
-const TRIBE_NAMES = ["Hundirahvas", "Kotkarahvas", "Kaljurahvas", "Männirahvas",
-  "Rebaserahvas", "Luigerahvas", "Ilveserahvas", "Tormirahvas"];
+const TRIBE_NAMES = ["Wolf Folk", "Eagle Folk", "Cliff Folk", "Pine Folk",
+  "Fox Folk", "Swan Folk", "Lynx Folk", "Storm Folk"];
 
 // nimi, mida pole veel kasutatud
 function freshName(sex, used) {

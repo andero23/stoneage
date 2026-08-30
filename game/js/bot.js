@@ -29,8 +29,8 @@ const Bot = {
   // Sündmuse valik strateegia järgi: agressiivne profiil võtab raidipakkumise vastu,
   // muud vaikevaliku. Kasutavad nii headless-testid kui balansilabor.
   eventChoice(ev, strategy) {
-    if (strategy && strategy.includes("raidiv") && ev.title === "Skaut leidis küla") {
-      const atk = ev.choices && ev.choices.find(c => c.label.startsWith("Saadame"));
+    if (strategy && strategy.includes("raidiv") && ev.title === "The scout found a camp") {
+      const atk = ev.choices && ev.choices.find(c => c.label.startsWith("Send the war party"));
       if (atk) return atk;
     }
     return ev.choices && ev.choices[ev.def || 0];

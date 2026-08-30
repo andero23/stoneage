@@ -5,54 +5,54 @@
 
 const Objectives = {
   DEFS: [
-    { id: "kogu20", title: "Kogu 20 TÜ toiduvaru",
-      hint: "Korilased korjavad, kalur püüab, kütt jahib. Vaata Rahva-vahekaarti.",
+    { id: "kogu20", title: "Gather 20 food",
+      hint: "Foragers pick, fishers catch, hunters hunt. Look at the People tab.",
       reward: 10,
       progress: () => ({ cur: Math.floor(Sim.foodTotal()), max: 20 }),
       check: () => Sim.foodTotal() >= 20 },
-    { id: "raam", title: "Ehita kuivatusraam",
-      hint: "Vaja 8 materjali (korilase režiim \"materjal\") ja meistrit, kes ehitab. Küla-vahekaart.",
+    { id: "raam", title: "Build a drying rack",
+      hint: "Needs 8 timber (set a forager to \"timber\") and a crafter to build it. Camp tab.",
       reward: 15,
       check: () => Sim.curSite().b.raam >= 1 },
-    { id: "kuivata", title: "Kuivata talveks 130 TÜ",
-      hint: "Määra korilane režiimile \"kuivatab\". Värske rikneb — talve elab üle ainult kuivatatu.",
+    { id: "kuivata", title: "Dry 130 food for winter",
+      hint: "Set a forager to \"drying food\". Fresh food rots — only dried food survives winter.",
       reward: 25,
       progress: () => ({ cur: Math.floor(G.dried), max: 130 }),
       check: () => G.dried >= 130 },
-    { id: "riided", title: "Riieta kõik talveks",
-      hint: "Kütt toob nahku (2 tk komplekti kohta), meister õmbleb. Küla-vahekaart.",
+    { id: "riided", title: "Clothe everyone for winter",
+      hint: "Hunters bring hides (2 per set), the crafter sews them. Camp tab.",
       reward: 15,
       progress: () => ({ cur: Sim.alive().filter(p => p.clothed).length, max: Sim.pop() }),
       check: () => Sim.alive().every(p => p.clothed) },
-    { id: "onn", title: "Peavari kõigile",
-      hint: "Ehita onn (20 materjali). Koobas loeb ka. Väljas magaja külmub.",
+    { id: "onn", title: "Shelter for everyone",
+      hint: "Build a hut (20 timber). A cave counts too. Whoever sleeps outside freezes.",
       reward: 15,
       progress: () => ({ cur: Math.min(Sim.shelterCap(), Sim.pop()), max: Sim.pop() }),
       check: () => Sim.shelterCap() >= Sim.pop() },
-    { id: "talv1", title: "Ela esimene talv üle",
-      hint: "Talvel: juured-režiim, vajadusel poolratsioonid. Nüüd makstakse sügiseste otsuste eest.",
+    { id: "talv1", title: "Survive your first winter",
+      hint: "In winter: roots mode, half rations if you must. Now autumn's choices come due.",
       reward: 40, big: true,
       check: () => G.year >= 2 },
-    { id: "kalajooks", title: "Kevadine kalajooks: 2 inimest kalale",
-      hint: "Kevad on näljakuu, aga jões keeb kudemine. Kalur on kevadel kulla hinnaga.",
+    { id: "kalajooks", title: "Spring run: put 2 on fishing",
+      hint: "Spring is the hungry season, but the river boils with spawning fish. A fisher is worth gold now.",
       reward: 20,
       progress: () => ({ cur: Sim.adults().filter(p => p.job === "kalur").length, max: 2 }),
       check: () => G.season === 0 && Sim.adults().filter(p => p.job === "kalur").length >= 2 },
-    { id: "pop8", title: "Kasvata rühm 8 inimeseni",
-      hint: "Hoia toidupuhvrit — rändajad liituvad rühmaga, kellel on, mida pakkuda.",
+    { id: "pop8", title: "Grow the band to 8",
+      hint: "Keep a food surplus — wanderers join a band that has something to offer.",
       reward: 25,
       progress: () => ({ cur: Sim.pop(), max: 8 }),
       check: () => Sim.pop() >= 8 },
-    { id: "luure", title: "Saada skaut naaberpaika luurele",
-      hint: "Määra kellelegi skaudi amet ja vali Kaardilt sihtkoht. Ükski koht ei kanna igavesti.",
+    { id: "luure", title: "Send a scout to a neighbouring site",
+      hint: "Give someone the scout trade and pick a target on the Map. No place feeds you forever.",
       reward: 15,
       check: () => G.sites.some(s => s.id !== 0 && s.known === 2 && !s.special) },
-    { id: "koli", title: "Ümbrus tühjeneb — vali uus kodu ja KOLI",
-      hint: "Ringiribad üleval paremal näitavad ammendumist. Kolida saab kevadel ja sügise alguses. Kõik su esivanemad liikusid.",
+    { id: "koli", title: "The land is spent — choose a new home and MOVE",
+      hint: "The ring bars top right show how spent the land is. You can move in spring and early autumn. Every ancestor of yours moved.",
       reward: 40, big: true,
       check: () => G.stats.moves >= 1 },
-    { id: "talv2", title: "Ehita uues kodus varud üles ja ela talv üle",
-      hint: "Sama tsükkel, uus koht: raam, varud, riided. Uus koht õpetab kiiresti.",
+    { id: "talv2", title: "Stock the new home and survive the winter",
+      hint: "Same cycle, new place: rack, stores, clothes. A new place teaches fast.",
       reward: 40, big: true,
       check: () => G.obj && G.obj.moveYear !== undefined && G.year > G.obj.moveYear },
   ],
@@ -98,19 +98,19 @@ const Objectives = {
       G.obj.idx++;
       G.score += def.reward;
       G.obj.celebrate = { title: def.title, reward: def.reward, big: !!def.big, day: G.day };
-      Sim.log("EESMÄRK TÄIDETUD: " + def.title + " (+" + def.reward + " 🏆)", "good");
+      Sim.log("GOAL COMPLETE: " + def.title + " (+" + def.reward + " 🏆)", "good");
       if (def.big) {
         const next = this.active();
         Sim.emit({
           title: "✓ " + def.title,
           body: (def.id === "talv1"
-            ? "Esimene talv on läbi. Kõik teie esivanemad on selle proovi läbinud — nüüd olete ka teie.\n\nKevad on näljakuu, aga ka võimaluste aeg."
+            ? "The first winter is behind you. Every one of your ancestors passed this test — now you have too.\n\nSpring is the hungry season, but it is also the season of chances."
             : def.id === "koli"
-            ? "Esimene rändamine. Vana koht jääb puhkama ja mäletama; teie lähete edasi, nagu käisid teie vanemad.\n\nSee ongi selle maailma elu: jääda või liikuda."
-            : "Uus kodu kannab teid. Tsükkel on selge: koht toidab, koht väsib, teie liigute.\n\nEdasine on sinu lugu.") +
-            "\n\n+" + def.reward + " skooripunkti." +
-            (next ? "\n\nJärgmine eesmärk: " + next.title : "\n\nEesmärkide rada on läbitud!"),
-          choices: [{ label: "Edasi", fx: () => {} }],
+            ? "Your first move. The old place is left to rest and remember; you walk on, as your parents walked.\n\nThat is the life of this world: stay or roam."
+            : "The new home carries you. The cycle is plain: a place feeds you, a place tires, you move on.\n\nWhat comes next is your story.") +
+            "\n\n+" + def.reward + " score." +
+            (next ? "\n\nNext goal: " + next.title : "\n\nYou have walked the whole path of goals!"),
+          choices: [{ label: "Onward", fx: () => {} }],
           def: 0,
         });
       }

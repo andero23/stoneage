@@ -68,7 +68,7 @@ const Sim = {
     for (const t of DATA.RITUAL_TYPES) G.ritualFx[t] = U.chance(0.6); // mõni rituaal ei tee mitte midagi
     Objectives.init();
     G.people.forEach((p, i) => { p.pos.x = 400 + i * 22; p.pos.y = 330; p.pos.tx = p.pos.x; p.pos.ty = p.pos.y; });
-    this.log("Teid on viis. Suvi on lahke, aga suvi valetab.", "evt");
+    this.log("There are five of you. The summer is kind, but the summer lies.", "evt");
     return G;
   },
 
@@ -115,7 +115,10 @@ const Sim = {
   },
 
   seasonName() { return DATA.SEASONS[G.season]; },
-  dateText() { return G.sday + ". " + this.seasonName() + ", " + G.year + ". aasta"; },
+  dateText() {
+    const sn = this.seasonName();
+    return sn.charAt(0).toUpperCase() + sn.slice(1) + " " + G.sday + ", year " + G.year;
+  },
 
   leaveCost() {
     const b = this.curSite().b;
@@ -358,7 +361,7 @@ const Sim = {
         if (unknown.length) {
           const s = U.pick(unknown);
           s.known = 1;
-          this.log(p.name + " kuulis rändajalt paigast nimega " + s.name + ".", "evt");
+          this.log(p.name + " heard a wanderer speak of a place called " + s.name + ".", "evt");
         }
       }
     }
@@ -375,7 +378,7 @@ const Sim = {
           if (unclothed) {
             unclothed.clothed = true;
             unclothed.clothesAge = 0;
-            this.log("Õhtuti nahku töödeldes said valmis talveriided: " + unclothed.name + " on riietatud.", "good");
+            this.log("Working hides in the evenings finished a set of winter clothes: " + unclothed.name + " is clothed.", "good");
           }
         }
       }
@@ -394,7 +397,7 @@ const Sim = {
       // eriline kivi: kaugemal harv, aga võimalik
       if (U.chance(DATA.GEAR.FIND_P[ring])) {
         G.finds.flint++;
-        this.log(p.name + " leidis " + U.pick(["odapea-kujulise kivi", "kirvetera-kujulise tulekivi", "sirge killustuva tuuma"]) + "! Meister oskaks sellest relva teha.", "good");
+        this.log(p.name + " found " + U.pick(["a stone shaped like a spearhead", "a flint with an axe edge", "a straight core that flakes true"]) + "! A crafter could make a weapon of it.", "good");
       }
       return;
     }
@@ -438,14 +441,14 @@ const Sim = {
       Person.addXP(p, "jaht", 30);
       if (U.chance(DATA.GEAR.BONE_BIGKILL_P)) {
         G.finds.bone++;
-        this.log(p.name + " tõi maha suure looma: " + Math.round(tu) + " TÜ liha, " + DATA.BIG_KILL_HIDES + " nahka ja tugevad luud (turvise tarvis).", "good");
+        this.log(p.name + " brought down a big animal: " + Math.round(tu) + " meat, " + DATA.BIG_KILL_HIDES + " hides and strong bones (good for armour).", "good");
       } else {
-        this.log(p.name + " tõi maha suure looma: " + Math.round(tu) + " TÜ liha ja " + DATA.BIG_KILL_HIDES + " nahka.", "good");
+        this.log(p.name + " brought down a big animal: " + Math.round(tu) + " meat and " + DATA.BIG_KILL_HIDES + " hides.", "good");
       }
-      if (U.chance(0.10)) this.woundPerson(p, U.ri(6, 14), "jahil viga saanud");
+      if (U.chance(0.10)) this.woundPerson(p, U.ri(6, 14), "hurt on the hunt");
       // sarvedega peakate: kogenud kütt, sügisene suursaak
       if (lvl >= 2 && G.season === 2 && !G.relics.some(r => r.key === "peakate") && U.chance(0.18)) {
-        this.gainRelic("peakate", p, p.name + " ei võtnud hirvelt ainult liha. Ta võttis pea, ja koos peaga midagi muud.");
+        this.gainRelic("peakate", p, p.name + " did not take only meat from the deer. They took the head, and with the head something else.");
       }
     }
   },
@@ -474,7 +477,7 @@ const Sim = {
         if (unclothed) {
           unclothed.clothed = true;
           unclothed.clothesAge = 0;
-          this.log(p.name + " õmbles talveriided: " + unclothed.name + " on riietatud.", "good");
+          this.log(p.name + " sewed winter clothes: " + unclothed.name + " is clothed.", "good");
         }
       }
       return;
@@ -488,7 +491,7 @@ const Sim = {
         G.gearProgress = 0;
         G.gearQueue.shift();
         G.gear.push({ id: G.nextGearId++, kind: q.kind, dur: q.kind === "relv" ? DATA.GEAR.WEAPON.dur : DATA.GEAR.ARMOR.dur });
-        this.log(p.name + " sai valmis: " + (q.kind === "relv" ? "tulekiviteraga relv" : "luust ja nahast turvis") + ".", "good");
+        this.log(p.name + " sai valmis: " + (q.kind === "relv" ? "a flint-edged weapon" : "armour of bone and hide") + ".", "good");
       }
       return;
     }
@@ -508,10 +511,10 @@ const Sim = {
     if (!t || (p.xp[dom] || 0) < DATA.TRAIT_REVEAL_XP) return;
     if (dom === t.gift && !t.giftKnown) {
       t.giftKnown = true;
-      this.log(p.name + " õpib valdkonda \"" + DATA.DOM_NAMES[dom] + "\" nii, nagu oleks ta selleks sündinud.", "good");
+      this.log(p.name + " takes to \"" + DATA.DOM_NAMES[dom] + "\" as if born to it.", "good");
     } else if (dom === t.weak && !t.weakKnown) {
       t.weakKnown = true;
-      this.log(p.name + " vaevleb: \"" + DATA.DOM_NAMES[dom] + "\" ei taha talle kätte tulla. Igaühel on oma rada.", "evt");
+      this.log(p.name + " struggles: \"" + DATA.DOM_NAMES[dom] + "\" will not come to them. Everyone has their own path.", "evt");
     }
   },
 
@@ -570,7 +573,7 @@ const Sim = {
         p.hungry++;
         p.health -= (1 - fedFrac) * 6;
       }
-      if (G.hungerRecent > 4 && U.chance(0.15)) this.log("Toitu ei jätku. Kõhud on tühjad.", "bad");
+      if (G.hungerRecent > 4 && U.chance(0.15)) this.log("There is not enough food. Bellies are empty.", "bad");
     } else {
       G.hungerRecent = Math.max(0, G.hungerRecent - 0.5);
       for (const p of this.alive()) p.hungry = 0;
@@ -590,7 +593,7 @@ const Sim = {
       if (f.age > life) { spoiled += f.a; return false; }
       return true;
     });
-    if (spoiled > 3) this.log(Math.round(spoiled) + " TÜ värsket toitu läks halvaks.", "bad");
+    if (spoiled > 3) this.log(Math.round(spoiled) + " of the fresh food has gone bad.", "bad");
   },
 
   // ---------- tervis ----------
@@ -608,7 +611,7 @@ const Sim = {
       if (p.sick) {
         p.sick.days -= 1 + (shaman ? 0.5 : 0) + (healBuff ? 0.5 : 0);
         p.health -= 2.0;
-        if (p.sick.days <= 0) { p.sick = null; this.log(p.name + " on jälle terve.", "good"); }
+        if (p.sick.days <= 0) { p.sick = null; this.log(p.name + " is well again.", "good"); }
       }
       if (p.wound > 0) {
         p.wound -= 1 + (shaman ? 0.3 : 0);
@@ -622,13 +625,13 @@ const Sim = {
         if (G.coldSnap > 0) exposure *= 2;
         p.health -= exposure * 1.1;
         if (!p.clothed && !p.sick && U.chance(0.01)) {
-          p.sick = { name: "külmetus", days: U.ri(4, 7) };
-          this.log(p.name + " jäi külmetuse kätte.", "bad");
+          p.sick = { name: "chill", days: U.ri(4, 7) };
+          this.log(p.name + " has caught a chill.", "bad");
         }
       }
       // taastumine
       if (!p.sick && p.hungry === 0 && G.ration >= 1) p.health = Math.min(100, p.health + 2);
-      if (p.health <= 0) this.killPerson(p, p.hungry > 3 ? "nälg" : (G.season === 3 ? "külm" : "haigus"));
+      if (p.health <= 0) this.killPerson(p, p.hungry > 3 ? "hunger" : (G.season === 3 ? "cold" : "sickness"));
     }
     if (G.coldSnap > 0) G.coldSnap--;
   },
@@ -685,22 +688,22 @@ const Sim = {
     if (site.b.pyha && this.hasShaman()) {
       G.faith = Math.min(100, G.faith + 2);
       site.graves++;
-      this.log(p.name + " suri (" + cause + "). Ta maeti kombekohaselt. Kalme seob teid selle kohaga.", "bad");
+      this.log(p.name + " died (" + cause + "). They were buried properly. The grave binds you to this place.", "bad");
     } else {
       G.faith = Math.max(0, G.faith - 8);
       site.graves++;
-      this.log(p.name + " suri (" + cause + "). Matus oli kasin ja see jäi kõigile hinge.", "bad");
+      this.log(p.name + " died (" + cause + "). The burial was meagre and it sat heavy on everyone.", "bad");
     }
     G.leaveP += Math.max(2, 10 - G.faith * 0.1);
     // reliikvia jääb järele
     const relic = G.relics.find(r => r.bearerId === p.id);
     if (relic) {
       relic.bearerId = null;
-      this.log(relic.name + " jäi kandjata. Keegi peab selle üle võtma.", "evt");
+      this.log(relic.name + " has no bearer. Someone must take it up.", "evt");
     }
     if (wasShaman && !this.adults().some(q => q.job === "samaan")) {
       G.faith = Math.max(0, G.faith - 20);
-      this.log("Šamaan on surnud. Keegi ei tea, kuidas vaimudega rääkida. Usk kõigub.", "bad");
+      this.log("The shaman is dead. Nobody knows how to speak to the spirits. Faith wavers.", "bad");
     }
     // vanem, kellel oli oskusi: reliikviavõimalus matuselt
     if (!p.child && p.age >= 45 && site.b.pyha && !G.relics.some(r => r.key === "ehe") && U.chance(0.2)) {
@@ -716,7 +719,7 @@ const Sim = {
     G.rep = Math.max(0, G.rep - 5);
     const relic = G.relics.find(r => r.bearerId === p.id);
     if (relic) relic.bearerId = null;
-    this.log(p.name + " lahkus öösel. Ta võttis oma teadmise kaasa ja räägib teist mujal.", "bad");
+    this.log(p.name + " left in the night, taking their knowledge along, and will speak of you elsewhere.", "bad");
     this.checkGameOver();
   },
 
@@ -727,11 +730,11 @@ const Sim = {
       Bridge.onRecord && Bridge.onRecord();
       const kids = this.alive().length;
       this.emit({
-        title: "Lugu on läbi",
+        title: "The story ends",
         body: (kids > 0
-          ? "Täiskasvanuid ei ole enam. Lapsed rändasid naaberhõimu juurde ja unustasid mõne aastaga teie nimed.\n\n"
-          : "Kedagi ei ole enam. Tuli kustus ja lumi kattis laagripaiga.\n\n") + this.storySummary(),
-        choices: [{ label: "Alusta uut mängu", fx: () => { Bridge.onRestart && Bridge.onRestart(); } }],
+          ? "There are no adults left. The children walked to a neighbouring band and within a few years forgot your names.\n\n"
+          : "There is nobody left. The fire went out and snow covered the camp.\n\n") + this.storySummary(),
+        choices: [{ label: "Begin a new game", fx: () => { Bridge.onRestart && Bridge.onRestart(); } }],
         def: 0,
       });
     }
@@ -740,10 +743,10 @@ const Sim = {
   storySummary() {
     const s = G.stats;
     const years = G.year - 1 + (G.season + 1) / 4;
-    return "SKOOR: " + Math.round(G.score) + "\n\nKestsite " + U.round1(years) + " aastat. Surma sai " + s.deaths.length +
-      ", lahkus " + s.leaves + ", sündis " + s.births + ", liitus " + s.joins +
-      ". Kolisite " + s.moves + " korda. Pidusid " + s.feasts + ", lahinguid " + s.battles +
-      ", võidetud sõjaretki " + (G.stats.raidsMade || 0) + ".";
+    return "SCORE: " + Math.round(G.score) + "\n\nYou lasted " + U.round1(years) + " years. Died: " + s.deaths.length +
+      ", left: " + s.leaves + ", born: " + s.births + ", joined: " + s.joins +
+      ". You moved " + s.moves + " times. Feasts " + s.feasts + ", battles " + s.battles +
+      ", raids won " + (G.stats.raidsMade || 0) + ".";
   },
 
   // ---------- reliikviad ----------
@@ -759,8 +762,8 @@ const Sim = {
     G.rep = Math.min(100, G.rep + 3);
     this.log("Reliikvia: " + def.name + ". " + def.desc, "evt");
     this.emit({
-      title: "Reliikvia: " + def.name,
-      body: r.origin + "\n\n" + def.desc + (def.job ? "\n\nSee kuulub kandjale, mitte külale. " + (bearer ? bearer.name + " kannab seda nüüd." : "Keegi peab selle üle võtma (Teod → reliikviad).") : ""),
+      title: "Relic: " + def.name,
+      body: r.origin + "\n\n" + def.desc + (def.job ? "\n\nThis belongs to a bearer, not to the camp. " + (bearer ? bearer.name + " carries it now." : "Someone must take it up (Acts → relics).") : ""),
       choices: [{ label: "Olgu nii", fx: () => {} }],
       def: 0,
     });
@@ -769,11 +772,11 @@ const Sim = {
   assignRelic(relicIdx, personId) {
     const r = G.relics[relicIdx];
     if (!r) return;
-    if (this.foodTotal() < 5) { this.log("Üleandmisrituaal vajab 5 TÜ toitu.", "bad"); return; }
+    if (this.foodTotal() < 5) { this.log("The handing-over rite needs 5 food.", "bad"); return; }
     this.consumeFood(5);
     r.bearerId = personId;
     const p = G.people.find(p => p.id === personId);
-    this.log(r.name + " anti üle: nüüd kannab seda " + (p ? p.name : "keegi") + ".", "evt");
+    this.log(r.name + " was handed over: " + (p ? p.name : "someone") + " carries it now.", "evt");
   },
 
   consumeFood(amt) {
@@ -786,41 +789,41 @@ const Sim = {
   queueBuild(key) {
     const def = DATA.BUILDINGS[key];
     const site = this.curSite();
-    if (G.journey) return "Olete teel — ehitada saab kohale jõudes.";
-    if (site.b[key] >= def.max) return "Rohkem ei mahu.";
-    if (G.mat < def.mat) return "Materjali napib (" + Math.floor(G.mat) + "/" + def.mat + ").";
-    if (G.buildQueue.some(b => b.key === key) && def.max === 1) return "Juba ehitamisel.";
+    if (G.journey) return "You are on the road — you can build when you arrive.";
+    if (site.b[key] >= def.max) return "No room for more.";
+    if (G.mat < def.mat) return "Not enough timber (" + Math.floor(G.mat) + "/" + def.mat + ").";
+    if (G.buildQueue.some(b => b.key === key) && def.max === 1) return "Already being built.";
     G.mat -= def.mat;
     G.buildQueue.push({ key, workLeft: def.work });
-    this.log(def.name + " ehitus algas (vajab meistrit).", "evt");
+    this.log("Work has begun on the " + def.name.toLowerCase() + " (needs a crafter).", "evt");
     return null;
   },
 
   queueClothes() {
-    if (G.hides < DATA.CLOTHES_HIDES) return "Nahku napib (" + Math.floor(G.hides) + "/" + DATA.CLOTHES_HIDES + ").";
-    if (this.alive().every(p => p.clothed) && G.clothQueue === 0) return "Kõik on juba riietatud.";
+    if (G.hides < DATA.CLOTHES_HIDES) return "Not enough hides (" + Math.floor(G.hides) + "/" + DATA.CLOTHES_HIDES + ").";
+    if (this.alive().every(p => p.clothed) && G.clothQueue === 0) return "Everyone is clothed already.";
     G.hides -= DATA.CLOTHES_HIDES;
     G.clothQueue++;
-    this.log("Meister hakkab talveriideid õmblema.", "evt");
+    this.log("The crafter starts on winter clothes.", "evt");
     return null;
   },
 
   queueGear(kind) {
     if (kind === "relv") {
       const W = DATA.GEAR.WEAPON;
-      if (G.finds.flint < W.flint) return "Vaja on erilist kivileidu (kaugemalt materjalikorjelt).";
-      if (G.mat < W.mat) return "Materjali napib (" + Math.floor(G.mat) + "/" + W.mat + ").";
+      if (G.finds.flint < W.flint) return "You need a special stone (from timber work further out).";
+      if (G.mat < W.mat) return "Not enough timber (" + Math.floor(G.mat) + "/" + W.mat + ").";
       G.finds.flint -= W.flint;
       G.mat -= W.mat;
     } else {
       const A = DATA.GEAR.ARMOR;
-      if (G.finds.bone < A.bone) return "Vaja on suuruluki luid (" + G.finds.bone + "/" + A.bone + ") — suurjahilt või suursaagilt.";
-      if (G.hides < A.hides) return "Nahku napib (" + Math.floor(G.hides) + "/" + A.hides + ").";
+      if (G.finds.bone < A.bone) return "You need great bones (" + G.finds.bone + "/" + A.bone + ") — from the great hunt or a big kill.";
+      if (G.hides < A.hides) return "Not enough hides (" + Math.floor(G.hides) + "/" + A.hides + ").";
       G.finds.bone -= A.bone;
       G.hides -= A.hides;
     }
     G.gearQueue.push({ kind });
-    this.log("Meister võttis töösse: " + (kind === "relv" ? "relv" : "turvis") + ".", "evt");
+    this.log("The crafter has started on " + (kind === "relv" ? "a weapon" : "armour") + ".", "evt");
     return null;
   },
 
@@ -829,9 +832,9 @@ const Sim = {
   // ---------- teod ----------
   canFeast() {
     const cost = Math.ceil(this.pop() * DATA.FEAST_COST_PER_POP);
-    if (G.journey) return { ok: false, why: "Olete teel." };
-    if (G.cool.pidu > 0) return { ok: false, why: "Eelmine pidu on veel meeles (" + G.cool.pidu + " p)." };
-    if (this.foodTotal() < cost) return { ok: false, why: "Vaja " + cost + " TÜ toitu, laos " + Math.floor(this.foodTotal()) + "." };
+    if (G.journey) return { ok: false, why: "You are on the road." };
+    if (G.cool.pidu > 0) return { ok: false, why: "The last feast is still fresh in memory (" + G.cool.pidu + "d)." };
+    if (this.foodTotal() < cost) return { ok: false, why: "Needs " + cost + " food, you have " + Math.floor(this.foodTotal()) + "." };
     return { ok: true, cost };
   },
 
@@ -849,15 +852,15 @@ const Sim = {
     for (const n of G.neighbors) {
       if (n.known) { n.att = Math.min(100, n.att + 10); visitors = true; }
     }
-    this.log("Pidu! Liha, lood ja laulud. Maine ja usk tõusevad." +
-      (visitors ? " Naabrid tulid külla. Nad naeratasid ja lugesid teie varusid." : ""), "evt");
+    this.log("A feast! Meat, stories and songs. Renown and faith rise." +
+      (visitors ? " The neighbours came by. They smiled, and they counted your stores." : ""), "evt");
   },
 
   canRitual() {
-    if (G.journey) return { ok: false, why: "Olete teel." };
-    if (!this.hasShaman()) return { ok: false, why: "Vaja on šamaani, kes on kohal ja terve." };
-    if (G.cool.ritual > 0) return { ok: false, why: "Vaimud vajavad rahu (" + G.cool.ritual + " p)." };
-    if (this.foodTotal() < DATA.RITUAL_COST) return { ok: false, why: "Ohvriks on vaja " + DATA.RITUAL_COST + " TÜ toitu." };
+    if (G.journey) return { ok: false, why: "You are on the road." };
+    if (!this.hasShaman()) return { ok: false, why: "You need a shaman who is here and well." };
+    if (G.cool.ritual > 0) return { ok: false, why: "The spirits need quiet (" + G.cool.ritual + "d)." };
+    if (this.foodTotal() < DATA.RITUAL_COST) return { ok: false, why: "The offering needs " + DATA.RITUAL_COST + " food." };
     return { ok: true };
   },
 
@@ -869,27 +872,27 @@ const Sim = {
     G.cool.ritual = DATA.RITUAL_COOLDOWN;
     G.faith = Math.min(100, G.faith + 6);
     G.stats.rituals++;
-    this.log(DATA.RITUAL_NAMES[type] + " on peetud. Suits tõusis otse üles. Kas see tähendab midagi, ei tea keegi.", "evt");
+    this.log(DATA.RITUAL_NAMES[type] + " has been held. The smoke rose straight up. Whether that means anything, nobody knows.", "evt");
   },
 
   // suurjaht
   canSuurjaht() {
-    if (G.journey) return { ok: false, why: "Olete teel." };
-    if (G.cool.suurjaht > 0) return { ok: false, why: "Loomad on ärevil (" + G.cool.suurjaht + " p)." };
-    if (G.suurjaht) return { ok: false, why: "Suurjaht juba käib." };
+    if (G.journey) return { ok: false, why: "You are on the road." };
+    if (G.cool.suurjaht > 0) return { ok: false, why: "The animals are restless (" + G.cool.suurjaht + "d)." };
+    if (G.suurjaht) return { ok: false, why: "A great hunt is already out." };
     const able = this.adults().filter(p => Person.canWork(p) && !p.away && (p.job === "kytt" || p.job === "sodalane" || p.job === "kalur"));
-    if (able.length < DATA.SUURJAHT.minPeople) return { ok: false, why: "Vaja on 4 tervet kütti/sõdalast/kalurit laagris." };
+    if (able.length < DATA.SUURJAHT.minPeople) return { ok: false, why: "You need 4 fit hunters/warriors/fishers in camp." };
     return { ok: true, members: able.slice(0, 6) };
   },
 
   startSuurjaht() {
     const c = this.canSuurjaht();
     if (!c.ok) return;
-    const prey = U.pick(["karu", "tarvas", "põder"]);
+    const prey = U.pick(["a bear", "an aurochs", "an elk"]);
     for (const p of c.members) p.away = { type: "suurjaht", days: DATA.SUURJAHT.days, total: DATA.SUURJAHT.days };
     G.suurjaht = { days: DATA.SUURJAHT.days, members: c.members.map(p => p.id), prey };
     G.cool.suurjaht = DATA.SUURJAHT.cooldown;
-    this.log(c.members.length + " inimest läks suurjahile. Saagiks on silmatud " + prey + ".", "evt");
+    this.log(c.members.length + " went out on the great hunt. They have their eye on " + prey + ".", "evt");
   },
 
   resolveSuurjaht() {
@@ -910,28 +913,28 @@ const Sim = {
       G.seasonGain += tu;
       for (const p of members) Person.addXP(p, DATA.JOBS[p.job].dom, 40);
       G.finds.bone += 2;
-      this.log("Suurjaht õnnestus: " + sj.prey + " langes. " + Math.round(tu) + " TÜ liha, " + hides + " nahka ja suured luud (turvise tarvis).", "good");
+      this.log("The great hunt succeeded: " + sj.prey + " went down. " + Math.round(tu) + " meat, " + hides + " hides and great bones (good for armour).", "good");
       if (sj.prey === "karu" && !G.relics.some(r => r.key === "karukapp") && U.chance(DATA.SUURJAHT.relicP)) {
         const warrior = members.find(p => p.job === "sodalane") || members[0];
-        this.gainRelic("karukapp", warrior, "Karu, kes ei tahtnud surra. " + warrior.name + " lõi viimase löögi ja võttis käpa.");
+        this.gainRelic("karukapp", warrior, "A bear that would not die. " + warrior.name + " struck the last blow and took the paw.");
       }
-      if (U.chance(DATA.SUURJAHT.woundP)) this.woundPerson(U.pick(members), U.ri(10, 20), "suurjahil viga saanud");
+      if (U.chance(DATA.SUURJAHT.woundP)) this.woundPerson(U.pick(members), U.ri(10, 20), "hurt on the great hunt");
     } else {
-      this.log("Suurjaht ebaõnnestus. " + sj.prey + " pääses ja mehed tulid tühjade kätega.", "bad");
-      if (U.chance(0.4)) this.woundPerson(U.pick(members), U.ri(8, 18), "suurjahil viga saanud");
-      if (U.chance(DATA.SUURJAHT.deathP)) this.killPerson(U.pick(members.filter(p => p.alive)), sj.prey + " tappis ta jahil");
+      this.log("The great hunt failed. " + sj.prey + " got away and they came back empty-handed.", "bad");
+      if (U.chance(0.4)) this.woundPerson(U.pick(members), U.ri(8, 18), "hurt on the great hunt");
+      if (U.chance(DATA.SUURJAHT.deathP)) this.killPerson(U.pick(members.filter(p => p.alive)), sj.prey + " killed them on the hunt");
     }
   },
 
   // kaugretk
   canKaugretk() {
-    if (G.journey) return { ok: false, why: "Olete teel." };
-    if (G.exped) return { ok: false, why: "Kaugretk juba käib." };
-    if (this.pop() < DATA.KAUGRETK.minPop) return { ok: false, why: "Vaja on vähemalt " + DATA.KAUGRETK.minPop + " inimest hõimus." };
+    if (G.journey) return { ok: false, why: "You are on the road." };
+    if (G.exped) return { ok: false, why: "A long journey is already out." };
+    if (this.pop() < DATA.KAUGRETK.minPop) return { ok: false, why: "You need at least " + DATA.KAUGRETK.minPop + " people in the band." };
     const wars = this.adults().filter(p => p.job === "sodalane" && Person.canWork(p) && !p.away);
     const hunts = this.adults().filter(p => p.job === "kytt" && Person.canWork(p) && !p.away);
-    if (wars.length < DATA.KAUGRETK.minWar) return { ok: false, why: "Vaja on " + DATA.KAUGRETK.minWar + " tervet sõdalast (praegu " + wars.length + ")." };
-    if (hunts.length < DATA.KAUGRETK.minHunt) return { ok: false, why: "Vaja on " + DATA.KAUGRETK.minHunt + " tervet kütti (praegu " + hunts.length + ")." };
+    if (wars.length < DATA.KAUGRETK.minWar) return { ok: false, why: "You need " + DATA.KAUGRETK.minWar + " fit warriors (now " + wars.length + ")." };
+    if (hunts.length < DATA.KAUGRETK.minHunt) return { ok: false, why: "You need " + DATA.KAUGRETK.minHunt + " fit hunters (now " + hunts.length + ")." };
     return { ok: true, members: wars.slice(0, 3).concat(hunts.slice(0, 3)) };
   },
 
@@ -940,7 +943,7 @@ const Sim = {
     if (!c.ok) return;
     for (const p of c.members) p.away = { type: "retk", days: DATA.KAUGRETK.days, total: DATA.KAUGRETK.days };
     G.exped = { days: DATA.KAUGRETK.days, members: c.members.map(p => p.id) };
-    this.log("Kaugretk läks teele: 3 sõdalast ja 3 kütti, " + DATA.KAUGRETK.days + " päeva. Küla jääb nõrgemaks.", "evt");
+    this.log("The long journey set out: 3 warriors and 3 hunters, " + DATA.KAUGRETK.days + " days. The camp is left weaker.", "evt");
   },
 
   resolveKaugretk() {
@@ -963,23 +966,23 @@ const Sim = {
     G.rep = Math.min(100, G.rep + 4);
     for (const p of members) Person.addXP(p, DATA.JOBS[p.job].dom, 60);
     if (U.chance(0.5)) G.finds.bone++;
-    this.log("Kaugretk tuli tagasi: " + Math.round(tu) + " TÜ (pool juba kuivatatud) ja " + hides + " nahka.", "good");
-    if (U.chance(DATA.KAUGRETK.woundP)) this.woundPerson(U.pick(members), U.ri(10, 20), "kaugretkel viga saanud");
+    this.log("The long journey came back: " + Math.round(tu) + " food (half of it already dried) and " + hides + " hides.", "good");
+    if (U.chance(DATA.KAUGRETK.woundP)) this.woundPerson(U.pick(members), U.ri(10, 20), "hurt on the long journey");
     if (U.chance(DATA.KAUGRETK.deathP)) {
       const victim = U.pick(members.filter(p => p.alive));
-      if (victim) this.killPerson(victim, "hukkus kaugretkel");
+      if (victim) this.killPerson(victim, "died on the long journey");
     }
-    if (site.expeds >= 3 && U.chance(0.5)) this.log("Kütid ütlevad, et kaugjahimaad jäävad tühjemaks. Retked ei saa kesta igavesti.", "evt");
+    if (site.expeds >= 3 && U.chance(0.5)) this.log("The hunters say the far grounds are emptying. These journeys cannot go on forever.", "evt");
   },
 
   // ---------- skaut ----------
   canScout(siteId) {
-    if (G.journey) return { ok: false, why: "Olete teel." };
+    if (G.journey) return { ok: false, why: "You are on the road." };
     const scout = this.adults().find(p => p.job === "skaut" && Person.canWork(p) && !p.away);
-    if (!scout) return { ok: false, why: "Vaja on tervet skauti, kes on laagris." };
+    if (!scout) return { ok: false, why: "You need a fit scout who is in camp." };
     const target = G.sites[siteId];
-    if (!target || siteId === G.campId) return { ok: false, why: "Vale sihtkoht." };
-    if (G.season === 3) return { ok: false, why: "Talvel skaut teele ei lähe." };
+    if (!target || siteId === G.campId) return { ok: false, why: "Not a valid destination." };
+    if (G.season === 3) return { ok: false, why: "A scout will not travel in winter." };
     return { ok: true, scout, target };
   },
 
@@ -988,7 +991,7 @@ const Sim = {
     if (!c.ok) return;
     const dist = World.distDays(this.curSite(), c.target);
     c.scout.away = { type: "skaut", days: dist * 2, total: dist * 2, data: { siteId, dist } };
-    this.log(c.scout.name + " läks luurele: " + c.target.name + " (" + (dist * 2) + " päeva).", "evt");
+    this.log(c.scout.name + " set out to scout " + c.target.name + " (" + (dist * 2) + " days).", "evt");
   },
 
   resolveScout(p) {
@@ -1002,12 +1005,12 @@ const Sim = {
       const roll = U.r();
       if (roll < 0.25) {
         p.away = null;
-        this.killPerson(p, "jäi luureretkel kadunuks");
-        this.log("Skaut ei tulnud tagasi. Keegi ei tea, mis juhtus, ja see ongi kõige hullem.", "bad");
+        this.killPerson(p, "lost while scouting");
+        this.log("The scout never came back. Nobody knows what happened, and that is the worst of it.", "bad");
         return;
       }
-      this.woundPerson(p, U.ri(6, 12), "luurel viga saanud");
-      this.log(p.name + " tuli luurelt tagasi haavatuna, info jäi poolikuks.", "bad");
+      this.woundPerson(p, U.ri(6, 12), "hurt while scouting");
+      this.log(p.name + " came back from scouting wounded, and the word they brought is half a story.", "bad");
       target.known = Math.max(target.known, 1);
       Person.addXP(p, "skaut", 40);
       return;
@@ -1016,15 +1019,15 @@ const Sim = {
     target.estRich = lvl >= 2 ? target.rich : U.clamp(target.rich + U.ri(-20, 20), 15, 110);
     Person.addXP(p, "skaut", 80);
     const feat = [];
-    if (target.river) feat.push("jõgi");
-    if (target.cave) feat.push("koobas");
-    if (target.fishRun) feat.push("kalajooksu koht");
+    if (target.river) feat.push("river");
+    if (target.cave) feat.push("cave");
+    if (target.fishRun) feat.push("spawning run");
     if (lvl >= 1) {
-      feat.push("varjatus " + DATA.LEVEL_NAME(target.hidden));
-      feat.push("kaitstavus " + DATA.LEVEL_NAME(target.defensible));
+      feat.push(DATA.LEVEL_NAME(target.hidden) + " cover");
+      feat.push(DATA.LEVEL_NAME(target.defensible) + " to defend");
     }
-    if (target.occupied !== null) feat.push("seal elab " + G.neighbors[target.occupied].name);
-    this.log(p.name + " tuli luurelt: " + target.name + " on " + DATA.RICHNESS_NAME(target.estRich) +
+    if (target.occupied !== null) feat.push("lived in by " + G.neighbors[target.occupied].name);
+    this.log(p.name + " is back from scouting: " + target.name + " is " + DATA.RICHNESS_NAME(target.estRich) +
       (feat.length ? " (" + feat.join(", ") + ")" : "") + ".", "good");
     if (target.occupied !== null) G.neighbors[target.occupied].known = true;
 
@@ -1036,12 +1039,12 @@ const Sim = {
       sp.known = 2;
       sp.estRich = sp.rich;
       this.emit({
-        title: "Skaut rääkis tasase häälega",
-        body: p.name + " nägi teel midagi, millest kõva häälega ei räägita: " + sp.name + ".\n\n" +
-          "Vesi langeb sealt kaljult alla, kala seisab kärestiku all tihedalt nagu sügisel, ja koht on " +
-          "radade eest varjul. Sellised kohad ei püsi saladuses kaua — jutt hakkab levima sel hetkel, " +
-          "kui keegi sinna elama asub.",
-        choices: [{ label: "Märgime kaardile", fx: () => {} }],
+        title: "The scout spoke quietly",
+        body: p.name + " saw something on the road that people do not speak of aloud: " + sp.name + ".\n\n" +
+          "Water falls there from the cliff, the fish stand thick under the rapids as they do in autumn, and the place is " +
+          "hidden from the paths. Places like this do not stay secret long — the talk starts the moment " +
+          "someone settles there.",
+        choices: [{ label: "Mark it on the map", fx: () => {} }],
         def: 0,
       });
     }
@@ -1049,12 +1052,12 @@ const Sim = {
 
   // ---------- külaotsing ja sõjaretk ----------
   canScoutRaid() {
-    if (G.journey) return { ok: false, why: "Olete teel." };
-    if (G.season === 3) return { ok: false, why: "Talvel skaut teele ei lähe." };
-    if (G.raidOp) return { ok: false, why: "Sõjaretk juba käib." };
-    if (G.cool.raidScout > 0) return { ok: false, why: "Skaut alles puhkab retkest (" + G.cool.raidScout + " p)." };
+    if (G.journey) return { ok: false, why: "You are on the road." };
+    if (G.season === 3) return { ok: false, why: "A scout will not travel in winter." };
+    if (G.raidOp) return { ok: false, why: "A raid is already out." };
+    if (G.cool.raidScout > 0) return { ok: false, why: "The scout is still resting from the last trip (" + G.cool.raidScout + "d)." };
     const scout = this.adults().find(p => p.job === "skaut" && Person.canWork(p) && !p.away);
-    if (!scout) return { ok: false, why: "Vaja on tervet skauti, kes on laagris." };
+    if (!scout) return { ok: false, why: "You need a fit scout who is in camp." };
     return { ok: true, scout };
   },
 
@@ -1064,7 +1067,7 @@ const Sim = {
     const days = U.ri(DATA.RAIDOP.SEARCH_DAYS[0], DATA.RAIDOP.SEARCH_DAYS[1]);
     c.scout.away = { type: "skautraid", days, total: days };
     G.cool.raidScout = 10;
-    this.log(c.scout.name + " läks kaugetele radadele võõraid külasid otsima (" + days + " päeva).", "evt");
+    this.log(c.scout.name + " took the far paths to look for strangers' camps (" + days + " days).", "evt");
   },
 
   resolveScoutRaid(p) {
@@ -1074,15 +1077,15 @@ const Sim = {
     if (U.chance(Math.max(0.015, risk))) {
       if (U.chance(0.25)) {
         p.away = null;
-        this.killPerson(p, "jäi külaotsingul kadunuks");
+        this.killPerson(p, "lost while searching for camps");
         return;
       }
-      this.woundPerson(p, U.ri(6, 12), "külaotsingul viga saanud");
+      this.woundPerson(p, U.ri(6, 12), "hurt while searching for camps");
       return;
     }
     Person.addXP(p, "skaut", 60);
     if (!U.chance(DATA.RAIDOP.FIND_P + lvl * 0.08)) {
-      this.log(p.name + " tuli tagasi tühjalt: rajad olid vaiksed, suitsu ei paistnud kuskilt.", "evt");
+      this.log(p.name + " came back with nothing: the paths were quiet and no smoke showed anywhere.", "evt");
       return;
     }
     // küla genereeritakse LEIDMISE hetkel: suuri märkab kergemini
@@ -1113,7 +1116,7 @@ const Sim = {
     for (const p of party) p.away = { type: "raid", days: 999, total: 999 };
     G.raidOp = { phase: "minek", days: village.dist, dist: village.dist,
       village, members: party.map(p => p.id), loot: null };
-    this.log("Sõjasalk (" + party.length + ") asus teele: " + village.name + ", " + village.dist + " päeva. Küla jääb nõrgemaks.", "evt");
+    this.log("The war party (" + party.length + ") set out for " + village.name + ", " + village.dist + " days away. The camp is left weaker.", "evt");
   },
 
   raidReturn() {
@@ -1126,13 +1129,13 @@ const Sim = {
       this.addFreshOrDried(op.loot.food);
       G.hides += op.loot.hides;
       if (op.loot.relicKey) {
-        this.gainRelic(op.loot.relicKey, null, "Röövitud " + op.village.name + " külast. Nende vaimud tulid esemega kaasa — kelle poolel nad on, ei tea keegi.");
+        this.gainRelic(op.loot.relicKey, null, "Taken from the camp of " + op.village.name + ". Their spirits came along with it — whose side they are on, nobody knows.");
       }
-      this.log("Sõjasalk on kodus. Saak: " + Math.round(op.loot.food) + " TÜ, " + op.loot.hides + " nahka" +
+      this.log("The war party is home. Loot: " + Math.round(op.loot.food) + " food, " + op.loot.hides + " hides" +
         (op.loot.weapons ? ", " + op.loot.weapons + " relva" : "") + ". " +
-        (op.loot.bare ? "Küla jäi nende selja taga tühjaks." : "Võeti langenuilt, mida kanda jõuti."), "good");
+        (op.loot.bare ? "The camp was left bare behind them." : "They took off the fallen what they could carry."), "good");
     } else {
-      this.log("Sõjasalk on kodus. Tühjade kätega ja vaiksed.", "evt");
+      this.log("The war party is home. Empty-handed and silent.", "evt");
     }
   },
 
@@ -1149,7 +1152,7 @@ const Sim = {
     if (!p || !p.alive) return;
     p.wound = Math.max(p.wound, days);
     p.away = null;
-    this.log(p.name + " on " + why + ": " + days + " päeva töövõimetu. Ta sööb, aga ei tooda.", "bad");
+    this.log(p.name + " is " + why + ": " + days + " days unable to work. They eat, but produce nothing.", "bad");
   },
 
   // ühine pott: ohver on juhuslik sööja (kohalolijad ja ringitöölised; ka lapsed)
@@ -1157,42 +1160,42 @@ const Sim = {
     const eaters = this.alive().filter(q => !q.away || q.away.type === "ring");
     const victim = eaters.length ? U.pick(eaters) : gatherer;
     const days = U.ri(poi.days[0], poi.days[1]);
-    victim.sick = { name: mode + "mürgitus", days };
+    victim.sick = { name: (mode === "seened" ? "mushroom" : "food") + " poisoning", days };
     victim.away = null;
     const deathP = (this.hasShaman() ? poi.deathShaman : poi.death) * DATA.POISON_HEALTH_MULT(victim.health);
     const blame = victim.id === gatherer.id
-      ? victim.name + " sõi omaenda korjatud vale " + (mode === "seened" ? "seene" : "vilja")
-      : gatherer.name + " tõi koju vale " + (mode === "seened" ? "seene" : "vilja") + " ja " + victim.name + " sõi seda";
+      ? victim.name + " ate a bad " + (mode === "seened" ? "mushroom" : "berry") + " they had picked themselves"
+      : gatherer.name + " brought home a bad " + (mode === "seened" ? "mushroom" : "berry") + " and " + victim.name + " ate it";
     if (U.chance(deathP)) {
-      this.killPerson(victim, "seenemürgitus");
-      this.log(blame + ". Hommikul ta enam ei ärganud.", "bad");
+      this.killPerson(victim, "poisoning");
+      this.log(blame + ". In the morning they did not wake.", "bad");
     } else {
-      this.log(blame + ": haige " + days + " päeva." + (this.hasShaman() ? " Šamaan valvab tema juures." : ""), "bad");
+      this.log(blame + ": ill for " + days + " days." + (this.hasShaman() ? " The shaman sits with them." : ""), "bad");
     }
   },
 
   poisonPerson(p, mode, poi) {
     const days = U.ri(poi.days[0], poi.days[1]);
-    p.sick = { name: mode + "mürgitus", days };
+    p.sick = { name: (mode === "seened" ? "mushroom" : "food") + " poisoning", days };
     p.away = null;
     const deathP = (this.hasShaman() ? poi.deathShaman : poi.death) * DATA.POISON_HEALTH_MULT(p.health);
     if (U.chance(deathP)) {
-      this.killPerson(p, "seenemürgitus");
-      this.log("Vale seen. " + p.name + " ei ärganud hommikul enam üles.", "bad");
+      this.killPerson(p, "poisoning");
+      this.log("A bad mushroom. " + p.name + " did not wake in the morning.", "bad");
     } else {
-      this.log(p.name + " sõi midagi valet ja on haige (" + days + " p)." + (this.hasShaman() ? " Šamaan valvab tema juures." : ""), "bad");
+      this.log(p.name + " ate something bad and is ill (" + days + "d)." + (this.hasShaman() ? " The shaman sits with them." : ""), "bad");
     }
   },
 
   ringIncident(p, ring) {
     const roll = U.r();
     if (roll < DATA.RING_DEATH_SHARE && ring === 2) {
-      this.killPerson(p, "hukkus kaugel töötades");
+      this.killPerson(p, "died working far out");
     } else if (roll < 0.75) {
-      this.woundPerson(p, U.ri(5, 12), "õnnetusse sattunud (ring " + (ring + 1) + ")");
+      this.woundPerson(p, U.ri(5, 12), "caught in an accident (ring " + (ring + 1) + ")");
     } else {
       G.wolfPressure = Math.max(G.wolfPressure, 3);
-      this.log(p.name + " nägi ringis " + (ring + 1) + " kiskja jälgi. Rahvas on ärevil.", "bad");
+      this.log(p.name + " saw predator tracks in ring " + (ring + 1) + ". People are uneasy.", "bad");
     }
   },
 
@@ -1202,14 +1205,14 @@ const Sim = {
   },
 
   canMove(siteId) {
-    if (G.journey) return { ok: false, why: "Olete juba teel." };
+    if (G.journey) return { ok: false, why: "You are already on the road." };
     const target = G.sites[siteId];
-    if (!target || siteId === G.campId) return { ok: false, why: "Vale sihtkoht." };
-    if (target.occupied !== null) return { ok: false, why: "Seal elab " + G.neighbors[target.occupied].name + "." };
-    if (target.known === 0) return { ok: false, why: "Te ei tea sellest kohast midagi." };
-    if (!this.moveWindowOpen()) return { ok: false, why: "Liikumisaken on kinni. Liikuda saab kevadel ja sügise alguses." };
-    if (G.exped || G.suurjaht || G.raidOp) return { ok: false, why: "Osa rahvast on retkel. Oodake nad ära." };
-    if (this.adults().some(p => p.away && p.away.type === "skaut")) return { ok: false, why: "Skaut on veel teel. Oodake ta ära." };
+    if (!target || siteId === G.campId) return { ok: false, why: "Not a valid destination." };
+    if (target.occupied !== null) return { ok: false, why: G.neighbors[target.occupied].name + " live there." };
+    if (target.known === 0) return { ok: false, why: "You know nothing about that place." };
+    if (!this.moveWindowOpen()) return { ok: false, why: "The moving window is shut. You can move in spring and early autumn." };
+    if (G.exped || G.suurjaht || G.raidOp) return { ok: false, why: "Some of your people are away. Wait for them." };
+    if (this.adults().some(p => p.away && p.away.type === "skaut")) return { ok: false, why: "The scout is still out. Wait for them." };
     return { ok: true, target };
   },
 
@@ -1239,7 +1242,7 @@ const Sim = {
     if (seasonsHere < 4 && G.stats.moves > 0) {
       G.faith = Math.max(0, G.faith - 8);
       G.leaveP += 6;
-      this.log("Jälle minek. Vanemad ütlevad, et rahvas, kes ei püsi kuskil, kaotab lõpuks iseenda.", "bad");
+      this.log("Moving again. The elders say a people who settle nowhere lose themselves in the end.", "bad");
     }
 
     // kanda jõuab piiratud koguse
@@ -1256,9 +1259,9 @@ const Sim = {
 
     if (site.b.pyha) {
       G.faith = Math.max(0, G.faith - 15);
-      this.log("Pühapaik jäi maha. Vaimud jäid sinna, kuhu nad kutsuti. Usk langeb.", "bad");
+      this.log("The shrine was left behind. The spirits stayed where they were called. Faith falls.", "bad");
     }
-    if (site.graves > 0) this.log("Kalmed jäid maha. Esivanemad jäävad valvama tühja kohta.", "evt");
+    if (site.graves > 0) this.log("The graves were left behind. The ancestors stay to guard an empty place.", "evt");
 
     site.abandonedDay = G.day;
     // tühistame ring-eemaloleku
@@ -1268,16 +1271,16 @@ const Sim = {
     if (G.pursuit) {
       if (U.chance(0.5)) {
         G.pursuit = null;
-        this.log("Rasked rajad ja vihm kustutasid teie jäljed. Jälitajad jäid maha.", "good");
+        this.log("Hard paths and rain wiped out your tracks. The pursuers fell behind.", "good");
       } else {
-        this.log("Võõrad jäljed teie radadel. Keegi tuli teiega kaasa, eemalt.", "bad");
+        this.log("Strange tracks on your paths. Someone came along with you, at a distance.", "bad");
       }
     }
 
     G.journey = { to: siteId, days: dist, total: dist, from: G.campId };
     G.stats.moves++;
-    this.log("Teekond algas: " + c.target.name + ", " + dist + " päeva." +
-      (lostFood > 0 ? " Maha jäi " + lostFood + " TÜ toitu, mida ei jõutud kanda." : ""), "evt");
+    this.log("The journey began: " + c.target.name + ", " + dist + " days." +
+      (lostFood > 0 ? " " + lostFood + " food was left behind, more than could be carried." : ""), "evt");
     Bridge.onStateChange();
   },
 
@@ -1291,11 +1294,11 @@ const Sim = {
     if (U.chance(risk)) {
       const victim = U.pick(this.alive());
       if (U.chance(0.12)) {
-        this.killPerson(victim, "hukkus teekonnal");
+        this.killPerson(victim, "died on the road");
       } else {
         victim.health -= U.ri(15, 30);
-        this.log(victim.name + " sai teekonnal kannatada (" + U.pick(["jõeületus", "libe kallas", "külm vihm", "kukkumine rusul"]) + ").", "bad");
-        if (victim.health <= 0) this.killPerson(victim, "hukkus teekonnal");
+        this.log(victim.name + " was hurt on the road (" + U.pick(["a river crossing", "a slick bank", "cold rain", "a fall on scree"]) + ").", "bad");
+        if (victim.health <= 0) this.killPerson(victim, "died on the road");
       }
     }
     for (const p of this.alive()) if (p.sick) { p.sick.days--; if (p.sick.days <= 0) p.sick = null; }
@@ -1308,8 +1311,8 @@ const Sim = {
       site.estRich = site.rich;
       G.journey = null;
       this.log("Kohal: " + site.name + ". " + (site.cave ? "Koobas hoiab teid soojas, onni pole vaja ehitada. " : "") +
-        "Uus koht õpetab kiiresti (esimene hooaeg: kogemus kasvab jõudsalt).", "good");
-      if (site.b.onn || site.b.raam) this.log("Vana laagri ehitised on alles, kuigi aeg on neid näksinud.", "evt");
+        "A new place teaches fast (first season: experience comes quickly).", "good");
+      if (site.b.onn || site.b.raam) this.log("The old camp's buildings still stand, though time has gnawed at them.", "evt");
     }
     this.advanceTime();
     Bridge.onStateChange();
@@ -1332,7 +1335,7 @@ const Sim = {
     // igapäevased tähtpäevad
     if (G.season === 2 && G.sday === 5 && !G.journey) Events.autumnReminder();
     if (G.season === 2 && G.sday === DATA.WINDOW.SYGIS_UNTIL + 1) {
-      this.log("Sügisene liikumisaken sulgus. Nüüd ollakse siin kuni kevadeni.", "evt");
+      this.log("The autumn moving window has shut. You are here until spring now.", "evt");
     }
   },
 
@@ -1363,7 +1366,7 @@ const Sim = {
           p.child = false;
           p.job = "korilane";
           p.mode = "marjad";
-          this.log(p.name + " on täiskasvanu. Ta valib korilase tee (saad ametit muuta).", "good");
+          this.log(p.name + " is grown. They take up foraging (you can change their trade).", "good");
         }
       }
       if (p.clothed) {
@@ -1371,7 +1374,7 @@ const Sim = {
         if (p.clothesAge >= DATA.CLOTHES_LIFE_SEASONS) {
           p.clothed = false;
           p.clothesAge = 0;
-          this.log(p.name + " talveriided on kulunud kandmiskõlbmatuks.", "bad");
+          this.log(p.name + "'s winter clothes have worn through.", "bad");
         }
       }
     }
@@ -1380,20 +1383,20 @@ const Sim = {
     this.tryBirth();
 
     if (s === 0) {
-      this.log("KEVAD. Näljakuud: varud on otsas, uut ei ole veel. " +
-        (this.curSite().river ? "Kalajooks algab: kalurid püüavad hästi." : "") +
-        " Liikumisaken on lahti terve kevade.", "evt");
+      this.log("SPRING. The hungry months: the stores are gone and nothing new has grown. " +
+        (this.curSite().river ? "The run begins: fishers do well." : "") +
+        " The moving window is open all spring.", "evt");
     } else if (s === 1) {
-      this.log("SUVI. Küllus. Korja, õpi, ehita. Ja ära lase suvel end petta.", "evt");
+      this.log("SUMMER. Plenty. Gather, learn, build. And do not let the summer fool you.", "evt");
     } else if (s === 2) {
-      this.log("SÜGIS. Otsustav aeg: varuda, kuivatada, ehitada — või kolida (aken lahti 15 päeva).", "evt");
+      this.log("AUTUMN. The season that decides: store, dry, build — or move (the window is open 15 days).", "evt");
     } else if (s === 3) {
       Events.scheduleWinter();
-      this.log("TALV. Nüüd makstakse sügiseste otsuste eest — aga tööd jätkub: ehitamine, materjal, juured, talvejaht.", "evt");
+      this.log("WINTER. Now autumn's choices come due — but there is still work: building, timber, roots, winter hunting.", "evt");
       const cap = this.shelterCap();
-      if (cap < this.pop()) this.log("HOIATUS: peavarju on " + cap + " inimesele, teid on " + this.pop() + ". Väljas magajad külmuvad.", "bad");
+      if (cap < this.pop()) this.log("WARNING: there is shelter for " + cap + ", and you are " + this.pop() + ". Those sleeping outside will freeze.", "bad");
       const unclothed = this.alive().filter(p => !p.clothed).length;
-      if (unclothed > 0) this.log("HOIATUS: " + unclothed + " inimest on talveriieteta.", "bad");
+      if (unclothed > 0) this.log("WARNING: " + unclothed + " people have no winter clothes.", "bad");
     }
     Events.seasonRolls();
   },
@@ -1413,10 +1416,10 @@ const Sim = {
         G.surplusStreak = 0; // järgmine sünd nõuab kaks uut ülejäägiga hooaega
         mother.wound = Math.max(mother.wound, 5);
         if (U.chance(deathP)) {
-          this.killPerson(mother, "suri sünnitusel");
-          this.log("Laps sündis, aga " + mother.name + " ei jäänud ellu. Lapse nimi on " + baby.name + ".", "bad");
+          this.killPerson(mother, "died in childbirth");
+          this.log("A child was born, but " + mother.name + " did not survive. The child is called " + baby.name + ".", "bad");
         } else {
-          this.log("Sündis laps: " + baby.name + ". " + mother.name + " puhkab mõne päeva. Laps sööb poole ratsiooni ja kasvab kolm aastat.", "good");
+          this.log("A child was born: " + baby.name + ". " + mother.name + " rests a few days. A child eats half a ration and grows for three years.", "good");
           G.faith = Math.min(100, G.faith + 3);
         }
       }
@@ -1430,7 +1433,7 @@ const Sim = {
       if (!p.child && p.age >= 50) {
         const dieP = 0.10 + (p.age - 50) * 0.03;
         if (U.chance(dieP)) {
-          this.killPerson(p, "suri vanadusse");
+          this.killPerson(p, "died of old age");
         }
       }
     }

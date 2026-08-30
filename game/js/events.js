@@ -23,10 +23,10 @@ const Events = {
       n.known = true;
       G.sites[n.siteId].known = Math.max(G.sites[n.siteId].known, 1);
       Sim.emit({
-        title: "Suits silmapiiril",
-        body: "Kütid nägid kaugelt suitsu ja radadel võõraid jälgi. Te ei ole siin üksi.\n\n" +
-          n.name + " elab paigas nimega " + G.sites[n.siteId].name + ". Nad teavad nüüd ka teist.",
-        choices: [{ label: "Võtame teadmiseks", fx: () => {} }],
+        title: "Smoke on the horizon",
+        body: "The hunters saw smoke far off and strange tracks on the paths. You are not alone here.\n\n" +
+          n.name + " live in a place called " + G.sites[n.siteId].name + ". They know of you now too.",
+        choices: [{ label: "We will remember it", fx: () => {} }],
         def: 0,
       });
     }
@@ -37,7 +37,7 @@ const Events = {
       const n = G.neighbors[1];
       n.known = true;
       G.sites[n.siteId].known = Math.max(G.sites[n.siteId].known, 1);
-      Sim.log("Kaupleja rääkis rahvast nimega " + n.name + ". Nad elavat paigas " + G.sites[n.siteId].name + ".", "evt");
+      Sim.log("A trader spoke of a people called " + n.name + ". They are said to live at " + G.sites[n.siteId].name + ".", "evt");
     }
 
     // rändaja / liituja (suvi ja sügis); väikese rühmaga liitutakse kergemini
@@ -56,7 +56,7 @@ const Events = {
     if (G.season === 2 && U.chance(0.006) && (Sim.freshTotal() > 20 || G.dried > 20)) {
       const loss = Math.round((Sim.freshTotal() + G.dried) * U.rf(0.05, 0.12));
       Sim.consumeFood(loss);
-      Sim.log("Metssiga käis öösel varudes: " + loss + " TÜ läks kaotsi. Tara aitaks.", "bad");
+      Sim.log("A boar was in the stores at night: " + loss + " food lost. A fence would help.", "bad");
     }
 
     // liha peitmine (sotsiaalne kriis, kord mängus)
@@ -87,9 +87,9 @@ const Events = {
         for (let r = 0; r < 3; r++) { s.max[r] *= 0.8; s.points[r] = Math.min(s.points[r], s.max[r]); }
       }
       Sim.emit({
-        title: "Ilm on muutunud",
-        body: "Vanad ei mäleta nii hilist kevadet. Linnud tulid valel ajal, jää läks hilja.\n\nMidagi on maailmas nihkunud ja see ei nihku tagasi. Kõik paigad on nüüd vaesemad kui enne.\n\n(Kõikide laagripaikade rikkus langes püsivalt.)",
-        choices: [{ label: "Rasked ajad tulevad", fx: () => {} }],
+        title: "The weather has changed",
+        body: "The old ones do not remember a spring this late. The birds came at the wrong time, the ice went out late.\n\nSomething in the world has shifted, and it will not shift back. Every place is poorer now than it was.\n\n(The richness of every site has fallen for good.)",
+        choices: [{ label: "Hard years are coming", fx: () => {} }],
         def: 0,
       });
     }
@@ -103,11 +103,11 @@ const Events = {
       if (cand.length) {
         const p = U.pick(cand);
         Sim.emit({
-          title: "Unenäod",
-          body: p.name + " on kolm ööd järjest näinud unes sama hirve, kes räägib inimkeeli. Vanad ütlevad, et nii see algab.\n\nKas lubad tal minna vaimude teele? (Ta jätaks oma senise töö ja temast saaks šamaan.)",
+          title: "Dreams",
+          body: p.name + " has dreamt three nights running of the same deer, and it speaks in human words. The old ones say this is how it begins.\n\nWill you let them walk the spirits' road? (They would give up their present work and become a shaman.)",
           choices: [
-            { label: "Lubame. Meil on vaimuteadjat vaja.", fx: () => { p.job = "samaan"; Sim.log(p.name + " on nüüd šamaan.", "evt"); } },
-            { label: "Ei. Tööd on teha ja unenäod on unenäod.", sub: "Usk langeb pisut.", fx: () => { G.faith = Math.max(0, G.faith - 6); } },
+            { label: "Let them. We need someone who knows the spirits.", fx: () => { p.job = "samaan"; Sim.log(p.name + " is a shaman now.", "evt"); } },
+            { label: "No. There is work to do and dreams are dreams.", sub: "Faith falls a little.", fx: () => { G.faith = Math.max(0, G.faith - 6); } },
           ],
           def: 0,
         });
@@ -151,38 +151,38 @@ const Events = {
         ["sodalane", "kytt", "kalur"].includes(p.job)).length;
       Sim.emit({
         title: "Hundid",
-        body: "Öösel on lõkke ümber silmad. Hundikari on näljas ja teie lõhn on neile toit.\n\n" +
-          "Neid on " + wolves + ". Ring 2 ja 3 töölised on kaugel ega jõua appi." +
-          (fighters < 2 ? "\n\nTõsiseid võitlejaid on laagris vähe (" + fighters + ")." : ""),
+        body: "There are eyes around the fire tonight. The pack is hungry and your smell is food to them.\n\n" +
+          "There are " + wolves + " of them. The ring 2 and 3 workers are far off and cannot help." +
+          (fighters < 2 ? "\n\nThere are few real fighters in camp (" + fighters + ")." : ""),
         choices: [
-          { label: "Võtame nad vastu", sub: "Käigupõhine kaitse", fx: () => Combat.start({ type: "hundid", n: wolves }) },
-          { label: "Ohverdame osa varudest", sub: "Kaotad 20% toiduvarust, hundid lähevad", fx: () => {
+          { label: "We meet them", sub: "Turn-based defence", fx: () => Combat.start({ type: "hundid", n: wolves }) },
+          { label: "We give up part of the stores", sub: "Lose 20% of your food, the wolves go", fx: () => {
             const loss = Math.round(Sim.foodTotal() * 0.2);
             Sim.consumeFood(loss);
             G.sec = Math.max(0, G.sec - 8);
-            Sim.log("Hundid võtsid " + loss + " TÜ ja kadusid pimedusse. Keegi ei maganud sel ööl.", "bad");
+            Sim.log("The wolves took " + loss + " food and vanished into the dark. Nobody slept that night.", "bad");
           } },
         ],
         def: fighters >= 3 ? 0 : 1,
       });
     } else if (type === "kylmalaine") {
       G.coldSnap = 5;
-      Sim.log("KÜLMALAINE: viis päeva lõikavat pakast. Toidukulu kasvab, riieteta inimesed kannatavad.", "bad");
+      Sim.log("COLD SNAP: five days of cutting frost. Food goes faster and anyone without clothes suffers.", "bad");
     } else if (type === "haigus") {
       const n = Math.max(1, Math.round(Sim.pop() * U.rf(0.2, 0.4)));
       const victims = U.shuffle(Sim.alive()).slice(0, n);
       for (const v of victims) {
-        v.sick = { name: "palavik", days: U.ri(5, 10) };
+        v.sick = { name: "fever", days: U.ri(5, 10) };
         if ((v.child || v.age >= 45) && U.chance(Sim.hasShaman() ? 0.06 : 0.15)) {
-          Sim.killPerson(v, "suri palavikku");
+          Sim.killPerson(v, "died of fever");
         }
       }
-      Sim.log("Haigus käib laagris ringi: " + n + " inimest on palavikus. Tihe koosolemine tõi selle kaasa.", "bad");
+      Sim.log("Sickness is going round the camp: " + n + " people are in fever. Living close together brought it.", "bad");
     } else if (type === "varud") {
       const loss = Math.round(G.dried * U.rf(0.1, 0.2));
       if (loss > 0) {
         G.dried -= loss;
-        Sim.log("Niiskus ja närilised rikkusid varusid: " + loss + " TÜ kuivatatut läks raisku.", "bad");
+        Sim.log("Damp and vermin got into the stores: " + loss + " of the dried food is ruined.", "bad");
       }
     } else if (type === "randaja") {
       this.frozenWanderer();
@@ -203,20 +203,20 @@ const Events = {
       p.xp[dom] = lvl * DATA.XP_PER_LEVEL;
       p.job = dom === "kor" ? "korilane" : dom === "kala" ? "kalur" : "kytt";
       Sim.emit({
-        title: "Rändaja",
-        body: p.name + " seisab laagri serval. Ta on üksi rännanud kaua — ja see, et ta elus on, " +
-          "räägib enda eest: tema käed tunnevad " + DATA.DOM_NAMES[dom] + ".\n\n" +
-          "Väike rühm on rändajale sama suur õnn kui tema teile.",
+        title: "A wanderer",
+        body: p.name + " stands at the edge of camp. They have walked alone a long time — and the fact that they are alive " +
+          "speaks for itself: their hands know " + DATA.DOM_NAMES[dom] + ".\n\n" +
+          "A small band is as much luck for a wanderer as the wanderer is for you.",
         choices: [
-          { label: "Võtame vastu", fx: () => {
+          { label: "We take them in", fx: () => {
             p.pos = { x: 100, y: 300, tx: 480, ty: 320, wander: 0 };
             G.people.push(p);
             G.stats.joins++;
-            Sim.log(p.name + " liitus hõimuga. Ta oskab: " + DATA.DOM_NAMES[dom] + " (kogenu).", "good");
+            Sim.log(p.name + " joined the band, skilled in " + DATA.DOM_NAMES[dom] + ".", "good");
           } },
-          { label: "Saadame minema", sub: "Maine langeb pisut", fx: () => {
+          { label: "Send them away", sub: "Renown falls a little", fx: () => {
             G.rep = Math.max(0, G.rep - 4);
-            Sim.log("Rändaja saadeti minema. Ta läks, ja tema oskused läksid temaga.", "evt");
+            Sim.log("The wanderer was sent away. They went, and their skills went with them.", "evt");
           } },
         ],
         def: 0,
@@ -227,35 +227,35 @@ const Events = {
     let quality, desc;
     if (G.rep >= 70) {
       quality = 2;
-      desc = "Ta liigub nagu inimene, kes teab, mida teeb. Teie maine on temani jõudnud.";
+      desc = "They move like someone who knows what they are doing. Your renown reached them.";
     } else if (G.rep >= 45) {
       quality = 1;
-      desc = "Tavaline rändaja, väsinud aga terve.";
+      desc = "An ordinary wanderer, tired but sound.";
     } else {
       quality = 0;
-      desc = "Ta on kõhn ja köhib. Keegi teine teda vastu ei võtnud.";
+      desc = "Thin, and coughing. Nobody else took them in.";
     }
     const doms = ["kor", "kala", "jaht", "voit", "meister", "skaut"];
     const dom = U.pick(doms);
     const p = Person.create({ id: G.nextId++, age: U.ri(17, 45) });
     p.xp[dom] = quality * DATA.XP_PER_LEVEL;
-    if (quality === 0 && U.chance(0.5)) p.sick = { name: "kurnatus", days: U.ri(3, 6) };
+    if (quality === 0 && U.chance(0.5)) p.sick = { name: "exhaustion", days: U.ri(3, 6) };
     const domName = DATA.DOM_NAMES[dom];
     Sim.emit({
-      title: "Rändaja",
-      body: p.name + " seisab laagri serval ja ootab. " + desc +
-        (quality === 2 ? "\n\nTema käed räägivad oskusest: " + domName + "." : "") +
-        "\n\nÜks suu juurde, aga ka kaks kätt.",
+      title: "A wanderer",
+      body: p.name + " stands at the edge of camp, waiting. " + desc +
+        (quality === 2 ? "\n\nTheir hands speak of skill: " + domName + "." : "") +
+        "\n\nOne more mouth, but also two more hands.",
       choices: [
-        { label: "Võtame vastu", fx: () => {
+        { label: "We take them in", fx: () => {
           p.pos = { x: 100, y: 300, tx: 480, ty: 320, wander: 0 };
           G.people.push(p);
           G.stats.joins++;
-          Sim.log(p.name + " liitus hõimuga." + (quality === 2 ? " Ta oskab: " + domName + "." : ""), "good");
+          Sim.log(p.name + " joined the band." + (quality === 2 ? " Skilled in " + domName + "." : ""), "good");
         } },
-        { label: "Saadame minema", sub: "Maine langeb pisut", fx: () => {
+        { label: "Send them away", sub: "Renown falls a little", fx: () => {
           G.rep = Math.max(0, G.rep - 4);
-          Sim.log("Rändaja saadeti minema. Ta läks, ja tema lugu teist läks temaga.", "evt");
+          Sim.log("The wanderer was sent away. They went, and their story of you went with them.", "evt");
         } },
       ],
       def: Sim.foodTotal() > Sim.dailyNeed() * 15 ? 0 : 1,
@@ -266,23 +266,23 @@ const Events = {
     const p = Person.create({ id: G.nextId++, age: U.ri(20, 50) });
     const skilled = U.chance(0.4);
     if (skilled) p.xp[U.pick(["kor", "kala", "jaht", "meister"])] = DATA.XP_PER_LEVEL * U.ri(1, 2);
-    p.sick = { name: "külmavõetud", days: U.ri(4, 8) };
+    p.sick = { name: "frostbite", days: U.ri(4, 8) };
     Sim.emit({
-      title: "Külmunud rändaja",
-      body: "Keegi on lume seest ukse taha jõudnud. Ta on poolsurnud, aga elus.\n\n" +
-        "Kui võtate ta sisse, sööb ta teie varusid ja võib-olla ei tõuse üldse. Kui jätate välja, on ta hommikuks surnud.",
+      title: "A frozen wanderer",
+      body: "Someone has come out of the snow to your door. Half dead, but alive.\n\n" +
+        "Take them in and they eat your stores and may never rise at all. Leave them out and they are dead by morning.",
       choices: [
-        { label: "Sisse", sub: "Ta sööb, aga võib olla oskaja", fx: () => {
+        { label: "Bring them in", sub: "They eat, but may be skilled", fx: () => {
           p.pos = { x: 480, y: 340, tx: 480, ty: 330, wander: 0 };
           G.people.push(p);
           G.stats.joins++;
           G.faith = Math.min(100, G.faith + 4);
-          Sim.log(p.name + " toodi lõkke äärde. Kas temast tõuseb tulu, näitab kevad.", "evt");
+          Sim.log(p.name + " was brought to the fire. Whether any good comes of it, spring will show.", "evt");
         } },
-        { label: "Välja", sub: "Maine ja usk langevad", fx: () => {
+        { label: "Leave them out", sub: "Renown and faith fall", fx: () => {
           G.rep = Math.max(0, G.rep - 6);
           G.faith = Math.max(0, G.faith - 5);
-          Sim.log("Ta jäeti välja. Hommikul oli ukse taga vaikus ja keegi ei vaadanud teistele otsa.", "bad");
+          Sim.log("They were left outside. In the morning there was silence at the door and nobody met anyone's eyes.", "bad");
         } },
       ],
       def: G.dried > Sim.dailyNeed() * 12 ? 0 : 1,
@@ -300,28 +300,28 @@ const Events = {
     }
     const kids = group.filter(p => p.child).length;
     Sim.emit({
-      title: "Pagulased põhjast",
-      body: n + " inimest, neist " + kids + " last, ilma varustuseta. Nende kodupaik on otsas — nälg või vaen, seda nad ei räägi.\n\n" +
-        "Nad on tööjõud. Nad on suud. Nad on tulevased sugulased või tulevased vaenlased.",
+      title: "Refugees from the north",
+      body: n + " people, " + kids + " of them children, with nothing. Their home is finished — hunger or a feud, they do not say which.\n\n" +
+        "They are hands. They are mouths. They are future kin or future enemies.",
       choices: [
-        { label: "Võtame kõik vastu", sub: "+" + n + " inimest, usk tõuseb, toit kulub", fx: () => {
+        { label: "We take them all in", sub: "+" + n + " people, faith rises, food goes", fx: () => {
           group.forEach((p, i) => { p.pos = { x: 60 + i * 14, y: 300, tx: 440 + i * 12, ty: 330, wander: 0 }; G.people.push(p); });
           G.stats.joins += n;
           G.faith = Math.min(100, G.faith + 6);
           G.rep = Math.min(100, G.rep + 5);
-          Sim.log(n + " pagulast võeti vastu. Laager on kitsam ja lärmakam, aga südamed said soojemaks.", "good");
+          Sim.log(n + " refugees were taken in. The camp is tighter and louder, but hearts are warmer.", "good");
         } },
-        { label: "Võtame ainult töökäed", sub: "Täiskasvanud jäävad, lapsed ja nõrgad saadetakse edasi. Usk langeb.", fx: () => {
+        { label: "Only the working hands", sub: "The adults stay, the children and the weak are sent on. Faith falls.", fx: () => {
           const adults = group.filter(p => !p.child);
           adults.forEach((p, i) => { p.pos = { x: 60 + i * 14, y: 300, tx: 440 + i * 12, ty: 330, wander: 0 }; G.people.push(p); });
           G.stats.joins += adults.length;
           G.faith = Math.max(0, G.faith - 10);
-          Sim.log(adults.length + " võeti vastu, ülejäänud saadeti edasi. Keegi ei laulnud sel õhtul.", "bad");
+          Sim.log(adults.length + " were taken in, the rest sent on. Nobody sang that evening.", "bad");
         } },
-        { label: "Saadame kõik minema", sub: "Usk ja maine langevad", fx: () => {
+        { label: "Send them all on", sub: "Faith and renown fall", fx: () => {
           G.faith = Math.max(0, G.faith - 8);
           G.rep = Math.max(0, G.rep - 6);
-          Sim.log("Pagulased saadeti edasi. Nende jäljed lumes olid järgmisel hommikul alles.", "bad");
+          Sim.log("The refugees were sent on. Their tracks in the snow were still there next morning.", "bad");
         } },
       ],
       def: Sim.foodTotal() > Sim.dailyNeed() * 20 ? 0 : 2,
@@ -333,18 +333,18 @@ const Events = {
     if (!n) return;
     const offers = [];
     // toit <-> materjal
-    offers.push({ label: "10 nahka → merevaikkivi (reliikvia)", ok: () => G.hides >= 10 && !G.relics.some(r => r.key === "merevaik"),
-      fx: () => { G.hides -= 10; Sim.gainRelic("merevaik", null, "Kaupleja käest saadud kivi, mis on rännanud kaugemalt kui ükski teie esivanem."); } });
-    offers.push({ label: "15 TÜ toitu → 10 materjali", ok: () => Sim.foodTotal() >= 15,
-      fx: () => { Sim.consumeFood(15); G.mat += 10; Sim.log("Vahetus tehtud: toit materjali vastu.", "evt"); } });
-    offers.push({ label: "4 nahka → 12 TÜ kuivatatud toitu", ok: () => G.hides >= 4,
-      fx: () => { G.hides -= 4; G.dried += 12; Sim.log("Vahetus tehtud: nahad toidu vastu.", "evt"); } });
+    offers.push({ label: "10 hides → amber stone (relic)", ok: () => G.hides >= 10 && !G.relics.some(r => r.key === "merevaik"),
+      fx: () => { G.hides -= 10; Sim.gainRelic("merevaik", null, "Got from a trader: a stone that has travelled further than any ancestor of yours."); } });
+    offers.push({ label: "15 food → 10 timber", ok: () => Sim.foodTotal() >= 15,
+      fx: () => { Sim.consumeFood(15); G.mat += 10; Sim.log("A trade was made: food for timber.", "evt"); } });
+    offers.push({ label: "4 hides → 12 dried food", ok: () => G.hides >= 4,
+      fx: () => { G.hides -= 4; G.dried += 12; Sim.log("A trade was made: hides for food.", "evt"); } });
     const valid = offers.filter(o => o.ok());
     const choices = valid.map(o => ({ label: o.label, fx: o.fx }));
-    choices.push({ label: "Täna ei vaheta", fx: () => {} });
+    choices.push({ label: "No trade today", fx: () => {} });
     Sim.emit({
-      title: "Kaupleja " + n.name + " juurest",
-      body: "Ta laotab oma kraami nahale laiali ja ootab. Kauplemine on ka uudiste kuulamine: ta räägib radadest, ilmast ja sellest, kes kus elab.",
+      title: "A trader from " + n.name,
+      body: "They spread their goods out on a hide and wait. Trading is also listening to news: they talk of paths, of weather, and of who lives where.",
       choices,
       def: choices.length - 1,
     });
@@ -358,25 +358,25 @@ const Events = {
     if (!suspects.length) return;
     const culprit = U.pick(suspects);
     Sim.emit({
-      title: "Keegi peitis liha",
-      body: culprit.name + " magamisaseme alt leiti peidetud kuivatatud liha. Nälg teeb inimesest looma, aga jagamine on seadus, mis hoiab teid koos.\n\n" +
-        "Terve küla vaatab sind ja ootab, mida sa teed.",
+      title: "Someone has been hiding meat",
+      body: "Dried meat was found hidden under " + culprit.name + "'s bed. Hunger makes an animal of a person, but sharing is the law that holds you together.\n\n" +
+        "The whole camp is watching you, waiting to see what you do.",
       choices: [
-        { label: "Liha jagatakse, tema saab andeks", sub: "Usk tõuseb, aga ta võib uuesti proovida", fx: () => {
+        { label: "Share the meat, forgive them", sub: "Faith rises, but they may try again", fx: () => {
           G.dried += 6;
           G.faith = Math.min(100, G.faith + 5);
-          Sim.log("Liha jagati ära ja " + culprit.name + " sai andeks. Jagamine on seadus.", "evt");
+          Sim.log("The meat was shared out and " + culprit.name + " was forgiven. Sharing is the law.", "evt");
         } },
-        { label: "Ta aetakse minema", sub: "Karm õppetund: turvatunne tõuseb, aga üks inimene vähem", fx: () => {
+        { label: "Drive them out", sub: "A hard lesson: safety rises, but one person fewer", fx: () => {
           G.dried += 6;
           Sim.personLeaves(culprit);
           G.faith = Math.max(0, G.faith - 3);
           G.leaveP = Math.max(0, G.leaveP - 5);
-          Sim.log("Küla otsustas: kes peidab, see läheb. Keegi ei vaielnud vastu, aga keegi ei rõõmustanud ka.", "bad");
+          Sim.log("The camp decided: whoever hides, goes. Nobody argued, and nobody was glad either.", "bad");
         } },
-        { label: "Vaatame mööda", sub: "Usk langeb: seadus, mida ei kaitsta, ei ole seadus", fx: () => {
+        { label: "Look the other way", sub: "Faith falls: a law nobody defends is not a law", fx: () => {
           G.faith = Math.max(0, G.faith - 8);
-          Sim.log("Sellest ei räägitud. Aga kõik teavad, ja igaüks mõtleb nüüd oma peidupaigale.", "bad");
+          Sim.log("Nothing was said about it. But everyone knows, and everyone is thinking about a hiding place of their own now.", "bad");
         } },
       ],
       def: 0,
@@ -390,21 +390,21 @@ const Events = {
     const leavers = Math.max(1, Math.min(Math.round(Sim.pop() * 0.4), poolSize - 1));
     if (poolSize < 3) return;
     Sim.emit({
-      title: "Pool küla tahab lahkuda",
-      body: "Nad seisavad lõkke teisel pool, oma kimbud juba seotud. Nende jutt on lihtne: siin ei ole enam elu. Ja neil võib õigus olla.\n\n" +
-        "Umbes " + leavers + " inimest on valmis minema.",
+      title: "Half the camp wants to leave",
+      body: "They stand on the far side of the fire, their bundles already tied. Their case is simple: there is no living here any more. And they may be right.\n\n" +
+        "About " + leavers + " people are ready to go.",
       choices: [
-        { label: "Lase neil minna", sub: "Kaotad " + leavers + " inimest ja osa varusid, aga surve kaob", fx: () => {
+        { label: "Let them go", sub: "You lose " + leavers + " people and some stores, but the pressure lifts", fx: () => {
           this.removeLeavers(leavers);
           const foodShare = Math.round(Sim.foodTotal() * 0.3);
           Sim.consumeFood(foodShare);
           G.leaveP = 0;
           G.faith = Math.max(0, G.faith - 5);
-          Sim.log("Nad läksid koidikul. Väiksem rühm sööb vähem ja tülitseb vähem. Võib-olla oli see õige.", "evt");
+          Sim.log("They went at dawn. A smaller band eats less and quarrels less. Perhaps it was right.", "evt");
         } },
-        { label: "Palu neil jääda", sub: "Suur pidu + rituaal (20 TÜ). Kui usk on kõrge, jäävad.", fx: () => {
+        { label: "Ask them to stay", sub: "A great feast and a rite (20 food). If faith is high, they stay.", fx: () => {
           if (Sim.foodTotal() < 20) {
-            Sim.log("Toitu ei jätkunud isegi palumiseks. Nad läksid.", "bad");
+            Sim.log("There was not even enough food to ask with. They went.", "bad");
             this.removeLeavers(leavers);
             G.leaveP = 0;
             return;
@@ -413,11 +413,11 @@ const Events = {
           if (U.chance(0.3 + G.faith / 150)) {
             G.leaveP = 5;
             G.faith = Math.min(100, G.faith + 8);
-            Sim.log("Öö läbi räägiti, söödi ja lauldi. Hommikul olid kimbud lahti seotud. Seekord jäädi.", "good");
+            Sim.log("They talked and ate and sang all night. In the morning the bundles were untied. This time they stayed.", "good");
           } else {
             this.removeLeavers(Math.ceil(leavers / 2));
             G.leaveP = 5;
-            Sim.log("Osa jäi, osa läks ikkagi. Pidu pehmendas lahkumist, aga ei peatanud seda.", "bad");
+            Sim.log("Some stayed, some went anyway. The feast softened the parting but did not stop it.", "bad");
           }
         } },
       ],
@@ -450,7 +450,7 @@ const Events = {
       neighborId = avenger.id;
       tribeName = avenger.name;
       n = U.ri(3, 5);
-      reason = "Veri nõudis verd — nad ei unustanud.";
+      reason = "Blood called for blood — they did not forget.";
     } else {
       const vis = Sim.visibility();
       const p = U.clamp((vis - DATA.VIS.RAID_BASE) / DATA.VIS.RAID_DIV, 0, DATA.VIS.RAID_MAX);
@@ -462,23 +462,23 @@ const Events = {
         tribeName = nb.name;
         nb.raidsDone++;
         n = U.ri(2, 4);
-        reason = "Nad on teie varusid kaua vaadanud.";
+        reason = "They have been watching your stores a long time.";
       } else {
         // võõras hõim: suurus sinu järgi (sind näevad omasugused)
         const theirPop = Math.max(6, Math.round(Sim.pop() * U.rf(0.8, 1.8)));
         tribeName = U.pick(TRIBE_NAMES);
         n = U.clamp(Math.round(theirPop / 4), 2, 6);
-        reason = "Võõras rahvas, keda te ei tunne — umbes " + theirPop + " hinge. Teie suits ja teie rikkus paistavad kaugele.";
+        reason = "A strange people you do not know — about " + theirPop + " souls. Your smoke and your wealth show a long way off.";
       }
     }
 
     Sim.emit({
-      title: "Öine haarang!",
-      body: tribeName + " tuli koidueelsel tunnil. " + reason +
-        "\n\nNeid on " + n + ". Ring 2 ja 3 töölised on kaugel ega jõua appi.",
+      title: "Night raid!",
+      body: tribeName + " came in the hour before dawn. " + reason +
+        "\n\nThere are " + n + " of them. The ring 2 and 3 workers are far off and cannot help.",
       choices: [
-        { label: "Kaitseme laagrit", sub: "Käigupõhine lahing", fx: () => Combat.start({ type: "haarang", n, neighborId, tribeName }) },
-        { label: "Peidame end metsa", sub: "Nad võtavad, mida kanda jõuavad", fx: () => {
+        { label: "Defend the camp", sub: "Turn-based battle", fx: () => Combat.start({ type: "haarang", n, neighborId, tribeName }) },
+        { label: "Hide in the forest", sub: "They take what they can carry", fx: () => {
           const loss = Math.round(Sim.foodTotal() * 0.3);
           Sim.consumeFood(loss);
           let extra = "";
@@ -486,12 +486,12 @@ const Events = {
             const r = U.pick(G.relics);
             G.relics.splice(G.relics.indexOf(r), 1);
             G.stolenRelic = { key: r.key, name: r.name, neighborId };
-            extra = " NAD VÕTSID KAASA: " + r.name + ".";
+            extra = " THEY TOOK: " + r.name + ".";
             G.faith = Math.max(0, G.faith - 12);
           }
           G.rep = Math.max(0, G.rep - 8);
           G.sec = Math.max(0, G.sec - 10);
-          Sim.log("Peitsite end. Nad võtsid " + loss + " TÜ ja lahkusid naerdes." + extra, "bad");
+          Sim.log("You hid. They took " + loss + " food and left laughing." + extra, "bad");
         } },
       ],
       def: 0,
@@ -502,24 +502,24 @@ const Events = {
   raidTargetFound(village, scout) {
     const party = Sim.raidParty();
     const can = party.length >= DATA.RAIDOP.MIN_FIGHTERS;
-    const wealthTxt = village.rich > Sim.pop() * 12 ? "aidad paistavad täis" :
-      village.rich > Sim.pop() * 7 ? "varud paistavad korralikud" : "elavad kasinalt";
+    const wealthTxt = village.rich > Sim.pop() * 12 ? "their stores look full" :
+      village.rich > Sim.pop() * 7 ? "their stores look decent" : "they live meagrely";
     const choices = [];
     if (can) {
-      choices.push({ label: "Saadame sõjasalga (" + party.length + " meest)",
-        sub: "Teekond " + village.dist + " päeva sinna, sama palju tagasi. Küla jääb vahepeal nõrgaks.",
+      choices.push({ label: "Send the war party (" + party.length + ")",
+        sub: village.dist + " days there and the same back. The camp is left weak meanwhile.",
         fx: () => Sim.startRaid(village) });
     }
-    choices.push({ label: can ? "Jätame nad rahule" : "Ei saa rünnata (vaja " + DATA.RAIDOP.MIN_FIGHTERS + " tervet võitlejat laagris)",
-      sub: "Rajad muutuvad, valvurid vahetuvad — hiljem seda võimalust ei tule.",
-      fx: () => { Sim.log("Otsustasite " + village.name + " rahule jätta. " + scout.name + " ei rääkinud leiust kellelegi teisele.", "evt"); } });
+    choices.push({ label: can ? "Leave them be" : "Cannot attack (need " + DATA.RAIDOP.MIN_FIGHTERS + " fit fighters in camp)",
+      sub: "Paths change, watchmen change — this chance will not come again.",
+      fx: () => { Sim.log("You chose to leave " + village.name + " be. " + scout.name + " told nobody else what they had found.", "evt"); } });
     Sim.emit({
-      title: "Skaut leidis küla",
-      body: scout.name + " nägi suitsu ja luuras lähemale: " + village.name + ", umbes " + village.pop +
-        " hinge, " + wealthTxt + ". Kaitsjaid paistis " + village.defenders + ".\n\n" +
-        "Rünnata saab AINULT KOHE — homme on rajad teised ja võimalus läinud.\n\n" +
-        "Saak tuleb langenutelt: rõivad, varustus, vahel reliikvia. Kui küla jääb päriselt lahtiseks, saab palju rohkem. " +
-        "Kui kaotate, võidakse teid koju jälitada.",
+      title: "The scout found a camp",
+      body: scout.name + " saw smoke and crept closer: " + village.name + ", about " + village.pop +
+        " souls, " + wealthTxt + ". " + village.defenders + " defenders showed themselves.\n\n" +
+        "You can attack ONLY NOW — tomorrow the paths are different and the chance is gone.\n\n" +
+        "Loot comes off the fallen: clothes, gear, sometimes a relic. If the camp is left truly open, there is far more. " +
+        "Lose, and you may be tracked home.",
       choices,
       def: choices.length - 1,
     });
@@ -530,7 +530,7 @@ const Events = {
     const op = G.raidOp;
     const alive = op.members.map(id => G.people.find(p => p.id === id)).filter(p => p && p.alive);
     if (!alive.length) { G.raidOp = null; return; }
-    Sim.log("Sõjasalk jõudis " + op.village.name + " alla. Koidueelne tund on teie päralt.", "evt");
+    Sim.log("The war party reached " + op.village.name + ". The hour before dawn is yours.", "evt");
     Combat.start({
       type: "raid", n: op.village.defenders,
       tribeName: op.village.name, party: op.members,
@@ -543,27 +543,27 @@ const Events = {
   resolvePursuit() {
     const pu = G.pursuit;
     G.pursuit = null;
-    const name = pu.neighborId !== null ? G.neighbors[pu.neighborId].name : (pu.tribeName || "Võõras hõim");
+    const name = pu.neighborId !== null ? G.neighbors[pu.neighborId].name : (pu.tribeName || "A strange band");
     if (!U.chance(0.65)) {
-      Sim.log("Jäljed viisid jälitaja rappa ja sinna nad jäid. " + name + " ei leidnud teid.", "good");
+      Sim.log("The tracks led the pursuers into the bog and there they stayed. " + name + " never found you.", "good");
       return;
     }
     if (!U.chance(0.7)) {
       G.sec = Math.max(0, G.sec - 5);
-      Sim.log("Öösel nähti võõrast laagri lähedal. Ta vaatas kaua ja kadus. " + name + " teab nüüd, kus te elate — aga ei tulnud. Seekord.", "bad");
+      Sim.log("A stranger was seen near the camp at night. They watched a long time and were gone. " + name + " knows where you live now — but did not come. This time.", "bad");
       return;
     }
     const n = U.ri(3, 5);
     Sim.emit({
-      title: "Jälitaja tõi nad kohale",
-      body: name + " käis teie jälgedel nädalaid ja nüüd on nad siin — varjatus ei aita selle vastu, kes rada mööda tuli.\n\nNeid on " + n + ".",
+      title: "The tracker brought them here",
+      body: name + " followed your trail for weeks and now they are here — cover is no help against someone who came along the path.\n\nThere are " + n + " of them.",
       choices: [
-        { label: "Kaitseme laagrit", sub: "Käigupõhine lahing", fx: () => Combat.start({ type: "haarang", n, neighborId: pu.neighborId, tribeName: pu.tribeName }) },
-        { label: "Peidame end metsa", sub: "Nad võtavad, mida kanda jõuavad", fx: () => {
+        { label: "Defend the camp", sub: "Turn-based battle", fx: () => Combat.start({ type: "haarang", n, neighborId: pu.neighborId, tribeName: pu.tribeName }) },
+        { label: "Hide in the forest", sub: "They take what they can carry", fx: () => {
           const loss = Math.round(Sim.foodTotal() * 0.35);
           Sim.consumeFood(loss);
           G.rep = Math.max(0, G.rep - 8);
-          Sim.log("Peitsite end. Jälitatud küla maksis oma hinna: " + loss + " TÜ.", "bad");
+          Sim.log("You hid. Being tracked cost the camp its price: " + loss + " food.", "bad");
         } },
       ],
       def: 0,
@@ -572,10 +572,10 @@ const Events = {
 
     // reliikvia tagasitoomise retk (Teod-vahekaardilt)
   canRetrieve() {
-    if (!G.stolenRelic) return { ok: false, why: "Midagi ei ole varastatud." };
+    if (!G.stolenRelic) return { ok: false, why: "Nothing has been stolen." };
     const fighters = Sim.adults().filter(p => Person.canWork(p) && !p.away &&
       (p.job === "sodalane" || p.job === "kytt" || p.job === "kalur"));
-    if (fighters.length < 3) return { ok: false, why: "Vaja on 3 tervet võitlejat (sõdalane/kütt/kalur)." };
+    if (fighters.length < 3) return { ok: false, why: "You need 3 fit fighters (warrior/hunter/fisher)." };
     return { ok: true, fighters: fighters.slice(0, 5) };
   },
 
@@ -604,15 +604,15 @@ const Events = {
     const projPerDay = Math.max(0, G.seasonGain / Math.max(1, G.sday) - Sim.dailyNeed());
     const proj = Math.round(have + projPerDay * daysLeft * 0.7);
     let verdict;
-    if (proj >= need) verdict = "Praeguse tempoga peaks jätkuma. Aga tempo on lubadus, mitte ladu.";
-    else verdict = "PRAEGUSE TEMPOGA JÄÄD PUUDU.";
+    if (proj >= need) verdict = "At this rate it should be enough. But a rate is a promise, not a store.";
+    else verdict = "AT THIS RATE YOU WILL FALL SHORT.";
     Sim.emit({
-      title: "Talv tuleb",
-      body: "Talv tuleb " + daysLeft + " päeva pärast. Sul on talvekõlblikku varu " + have + " TÜ. Vaja on umbes " + need + " TÜ.\n\n" + verdict +
-        (site.cave ? "\n\nKoobas hoiab teid soojas. Onni ei ole vaja ehitada." : "") +
-        (site.b.raam === 0 ? "\n\nSul EI OLE kuivatusraami. Värske toit ei säili talveni." : "") +
-        "\n\nSügisene liikumisaken on lahti " + Math.max(0, DATA.WINDOW.SYGIS_UNTIL - G.sday + 1) + " päeva.",
-      choices: [{ label: "Selge", fx: () => {} }],
+      title: "Winter is coming",
+      body: "Winter comes in " + daysLeft + " days. You have " + have + " food that will keep. You need about " + need + ".\n\n" + verdict +
+        (site.cave ? "\n\nThe cave keeps you warm. You do not need to build a hut." : "") +
+        (site.b.raam === 0 ? "\n\nYou have NO drying rack. Fresh food will not last until winter." : "") +
+        "\n\nThe autumn moving window is open " + Math.max(0, DATA.WINDOW.SYGIS_UNTIL - G.sday + 1) + " more days.",
+      choices: [{ label: "Understood", fx: () => {} }],
       def: 0,
     });
   },
@@ -622,13 +622,13 @@ const Events = {
     const deathsThisYear = s.deaths.filter(d => d.year === G.year - 1);
     const site = Sim.curSite();
     Sim.emit({
-      title: G.year + ". aasta algab",
-      body: "Talv on läbi. Lume alt tuleb välja märg maa ja eelmise aasta lood.\n\n" +
-        "Rahvast: " + Sim.pop() + ". Surma sai mullu: " + deathsThisYear.length +
+      title: "Year " + G.year + " begins",
+      body: "Winter is over. Out from under the snow come wet ground and last year's stories.\n\n" +
+        "People: " + Sim.pop() + ". Died last year: " + deathsThisYear.length +
         (deathsThisYear.length ? " (" + deathsThisYear.map(d => d.name).join(", ") + ")" : "") + ".\n" +
-        "Laagripaik (" + site.name + "): ring 1 on " + Math.round(site.points[0] / site.max[0] * 100) + "% alles.\n\n" +
-        "Kevad on näljakuu, aga ka liikumisaken. Jääda või liikuda?",
-      choices: [{ label: "Uus aasta, vanad küsimused", fx: () => {} }],
+        "The camp (" + site.name + "): ring 1 is " + Math.round(site.points[0] / site.max[0] * 100) + "% left.\n\n" +
+        "Spring is the hungry season, but it is also the moving window. Stay or roam?",
+      choices: [{ label: "A new year, the old questions", fx: () => {} }],
       def: 0,
     });
   },
@@ -639,19 +639,19 @@ const Events = {
     const rich = Sim.foodTotal() > 200 && Sim.pop() >= 16;
     let story;
     if (settled && rich) {
-      story = "Te jäite. Kalmed sidusid teid maaga ja aidad tegid teist need, kelle juurde tullakse — ja kelle juurde tullakse ka röövima. Teie lapselapsed ehitavad siia midagi, mida teie ei oska veel nimetada. Vabadust nad enam ei mäleta, aga nälga ka mitte.";
+      story = "You stayed. The graves bound you to the land and the stores made you the people others come to — and come to raid. Your grandchildren will build something here that you have no name for yet. They will not remember freedom, but they will not remember hunger either.";
     } else if (settled) {
-      story = "Te jäite, kuigi kerge see ei olnud. Koht on teie oma — iga kivi, iga haud. Kas see oli õige valik, ei ütle teile keegi. Nii see ajastu käibki: keegi ei tea, ja kõik peavad ikkagi valima.";
+      story = "You stayed, though it was not easy. The place is yours — every stone, every grave. Whether it was the right choice, nobody will tell you. That is how this age works: nobody knows, and everyone must choose anyway.";
     } else if (s.moves >= 4) {
-      story = "Te ei jäänud kunagi. Kerge kimp, tuttavad rajad, tähed katuseks. Teid on vähe ja teid ei leia keegi, kui te ise ei taha. Vanad kohad mäletavad teid tulease kividena, ja see ongi kõik, mis teist maha jääb. Võib-olla sellest piisab.";
+      story = "You never stayed. A light bundle, familiar paths, stars for a roof. You are few, and nobody finds you unless you wish it. The old places remember you as the stones of a hearth, and that is all that is left of you. Perhaps that is enough.";
     } else {
-      story = "Te liikusite, kui pidi, ja jäite, kui sai. Kumbki tee ei ole teie oma — te käite nende vahel, nagu käisid teie vanemad. Otsus seisab endiselt ees, igal kevadel uuesti.";
+      story = "You moved when you had to and stayed when you could. Neither road is yours — you walk between them, as your parents walked. The choice still stands ahead of you, again every spring.";
     }
     Sim.emit({
-      title: "Kaheksa aastat",
-      body: "Kaheksa aastat on möödas sellest suvest, kui teid oli kuus.\n\n" + story + "\n\n" + Sim.storySummary() +
-        "\n\nVõid edasi mängida — maailm ei lõpe, ainult lugu sai punkti.",
-      choices: [{ label: "Mängin edasi", fx: () => {} }],
+      title: "Eight years",
+      body: "Eight years have passed since the summer when there were six of you.\n\n" + story + "\n\n" + Sim.storySummary() +
+        "\n\nYou can keep playing — the world does not end, only the story has reached a full stop.",
+      choices: [{ label: "I keep playing", fx: () => {} }],
       def: 0,
     });
   },

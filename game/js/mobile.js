@@ -35,7 +35,7 @@ const Mobile = {
     const main = document.getElementById("main");
     const hidden = main.classList.toggle("camp-min");
     const lab = document.querySelector("#sheet-handle .sh-label");
-    if (lab) lab.textContent = hidden ? "näita laagrit" : "peida laager";
+    if (lab) lab.textContent = hidden ? "show camp" : "hide camp";
   },
 
   // ---------- ühendused ----------

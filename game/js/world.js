@@ -60,8 +60,8 @@ const World = {
     // Peidetud erikohad: kaardil ei eksisteeri (isegi mitte "?"), kuni skaut avastab.
     // Rikas + kalajooks + varjatud = kiire kasvu koht, aga jutt levib seal kiiresti.
     const specials = [
-      { name: "Kosk",     rich: 100, river: true, cave: true,  fishRun: true, hid: 80, def: 70 },
-      { name: "Salajõgi", rich: 100, river: true, cave: false, fishRun: true, hid: 75, def: 55 },
+      { name: "The Falls",  rich: 100, river: true, cave: true,  fishRun: true, hid: 80, def: 70 },
+      { name: "Hidden River", rich: 100, river: true, cave: false, fishRun: true, hid: 75, def: 55 },
     ];
     for (const sp of specials) {
       sites.push({

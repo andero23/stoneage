@@ -270,7 +270,7 @@ const Render = {
       ctx.fillStyle = "#e8dcc4";
       ctx.font = "bold 20px 'Courier New'";
       ctx.textAlign = "center";
-      ctx.fillText("PAUS — tühik jätkab", 480, 308);
+      ctx.fillText("PAUSED — space to resume", 480, 308);
       ctx.textAlign = "left";
     }
   },
@@ -309,9 +309,9 @@ const Render = {
     ctx.fillStyle = "#e8dcc4";
     ctx.font = "bold 16px 'Courier New'";
     ctx.textAlign = "center";
-    ctx.fillText("Teel: " + G.sites[j.to].name, 480, 62);
+    ctx.fillText("Travelling to " + G.sites[j.to].name, 480, 62);
     ctx.font = "13px 'Courier New'";
-    ctx.fillText((j.total - j.days) + "/" + j.total + " päeva käidud", 480, 82);
+    ctx.fillText((j.total - j.days) + "/" + j.total + " days walked", 480, 82);
     ctx.textAlign = "left";
   },
 };

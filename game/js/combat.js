@@ -24,7 +24,7 @@ const Combat = {
       // kedagi pole kaitsmas: sama, mis peitmine
       const loss = Math.round(Sim.foodTotal() * 0.35);
       Sim.consumeFood(loss);
-      Sim.log("Kedagi polnud kaitsmas. Nad võtsid " + loss + " TÜ ja läksid.", "bad");
+      Sim.log("Nobody was there to defend. They took " + loss + " food and went.", "bad");
       return;
     }
 
@@ -94,7 +94,7 @@ const Combat = {
       if (kind === "roovel" && U.chance(0.4)) kind = "roovel_oda";
       const stats = DATA.COMBAT[kind];
       units.push({
-        id: uid++, side: "nemad", kind, name: kind === "hunt" ? "hunt" : "röövel",
+        id: uid++, side: "nemad", kind, name: kind === "hunt" ? "wolf" : "raider",
         pid: null, hp: stats.hp, maxhp: stats.hp,
         range: stats.range, hit: stats.hit, lo: stats.lo, hi: stats.hi, move: stats.move, wpn: stats.wpn,
         x: spotsR[i % spotsR.length].x, y: spotsR[i % spotsR.length].y,
@@ -112,10 +112,10 @@ const Combat = {
       presentOthers,
       over: false, result: null,
     };
-    this.clog((cfg.type === "hundid" ? "Hundid tulevad üle lume." :
+    this.clog((cfg.type === "hundid" ? "The wolves come across the snow." :
       cfg.type === "tagasitoomine" ? "Te hiilite nende laagrisse koidu eel. Reliikvia on seal." :
-      cfg.type === "raid" ? "Te hiilite " + (cfg.tribeName || "võõra küla") + " laagrisse koidu eel." :
-      "Nad tulid koidueelsel tunnil.") + " Iga võitlus on ohtlik ka võitjale.");
+      cfg.type === "raid" ? "You creep into the camp of " + (cfg.tribeName || "strangers") + " before dawn." :
+      "They came in the hour before dawn.") + " Every fight is dangerous, the winner's too.");
     Bridge.onCombat();
   },
 
@@ -185,10 +185,10 @@ const Combat = {
     if (U.chance(hitP)) {
       const dmg = U.ri(u.lo, u.hi);
       target.hp -= dmg;
-      this.clog(u.name + " (" + u.wpn + ") tabas: " + target.name + " −" + dmg + ".");
+      this.clog(u.name + " (" + u.wpn + ") hit " + target.name + " for −" + dmg + ".");
       if (target.hp <= 0) this.unitDown(target, u);
     } else {
-      this.clog(u.name + " (" + u.wpn + ") läks mööda.");
+      this.clog(u.name + " (" + u.wpn + ") missed.");
     }
     this.checkEnd();
     return true;
@@ -198,23 +198,23 @@ const Combat = {
     if (target.side === "nemad") {
       G.combat.enemiesKilled++;
       G.stats.kills++;
-      this.clog(target.name + " langes.");
+      this.clog(target.name + " is down.");
       if (killer && killer.pid !== null) {
         const p = G.people.find(p => p.id === killer.pid);
         if (p) Person.addXP(p, "voit", 100);
       }
     } else {
       const p = G.people.find(p => p.id === target.pid);
-      this.clog(target.name + " LANGES.");
-      if (p) Sim.killPerson(p, G.combat.type === "hundid" ? "hundid murdsid ta" :
-        G.combat.type === "raid" ? "langes sõjaretkel" : "langes lahingus");
+      this.clog(target.name + " IS DOWN.");
+      if (p) Sim.killPerson(p, G.combat.type === "hundid" ? "taken by wolves" :
+        G.combat.type === "raid" ? "fell on the raid" : "fell in battle");
     }
   },
 
   // üksus põgeneb servalt
   fleeUnit(u) {
     u.fled = true;
-    this.clog(u.name + " põgenes.");
+    this.clog(u.name + " fled.");
     this.checkEnd();
   },
 
@@ -234,7 +234,7 @@ const Combat = {
     // huntide moraal: kui pool karjast langenud, põgenevad
     if (c.type === "hundid") {
       if (c.enemiesKilled >= Math.max(1, Math.ceil(c.initialEnemies / 3))) {
-        this.clog("Kari murdub: hundid kaovad öhe.");
+        this.clog("The pack breaks: the wolves vanish into the night.");
         for (const u of this.alive("nemad")) u.fled = true;
         this.checkEnd();
         return;
@@ -243,7 +243,7 @@ const Combat = {
     // röövlid: kui üle poole langenud, taganevad
     if (c.type === "haarang" || c.type === "tagasitoomine" || c.type === "raid") {
       if (c.enemiesKilled > c.initialEnemies / 2) {
-        this.clog("Nad taganevad, kandes oma langenud kaasa.");
+        this.clog("They fall back, carrying their fallen with them.");
         for (const u of this.alive("nemad")) u.fled = true;
         this.checkEnd();
         return;
@@ -305,7 +305,7 @@ const Combat = {
         if (g.dur <= 0) { G.gear.splice(G.gear.indexOf(g), 1); broken++; }
       }
     }
-    if (broken > 0) Sim.log(broken + " varustuse-ese purunes lahingus. Meister vajab uusi leide.", "bad");
+    if (broken > 0) Sim.log(broken + " pieces of gear broke in the fight. The crafter needs new finds.", "bad");
 
     // haavad ellujäänutele
     for (const u of c.units) {
@@ -327,82 +327,82 @@ const Combat = {
       if (c.type === "hundid") {
         Sim.addFresh(8);
         G.sec = Math.min(100, G.sec + 8);
-        Sim.log("Hundid on löödud. Paar keret jäi lumele: 8 TÜ liha. Rahvas magab täna paremini.", "good");
+        Sim.log("The wolves are beaten. A couple of carcasses left on the snow: 8 meat. People sleep better tonight.", "good");
       } else if (c.type === "tagasitoomine") {
         const st = G.stolenRelic;
         if (st) {
-          G.relics.push({ key: st.key, name: st.name, origin: "Toodud verega tagasi (" + Sim.dateText() + ")", bearerId: null });
+          G.relics.push({ key: st.key, name: st.name, origin: "Taken back in blood (" + Sim.dateText() + ")", bearerId: null });
           G.stolenRelic = null;
         }
         G.faith = Math.min(100, G.faith + 10);
         G.rep = Math.min(100, G.rep + 6);
-        Sim.log("Reliikvia on tagasi. Sellest ööst räägitakse veel kaua — teie omad räägivad uhkusega, nende omad vihaga.", "good");
+        Sim.log("The relic is back. That night will be talked about for a long time — your people with pride, theirs with anger.", "good");
       } else {
         G.rep = Math.min(100, G.rep + 8);
         G.faith = Math.min(100, G.faith + 4);
         G.sec = Math.min(100, G.sec + 10);
-        Sim.log("Haarang on tagasi löödud. Varud jäid alles. See lugu levib.", "good");
+        Sim.log("The raid was beaten back. The stores are still yours. That story travels.", "good");
       }
     } else if (result === "pogenemine") {
       // haarangu eest põgenemine: vastane otsustab, kas saata skaut jälgi lugema
       if (c.type === "haarang" && (nb || c.tribeName) && U.chance(0.5)) {
         G.pursuit = { neighborId: nb ? nb.id : null, tribeName: c.tribeName, days: U.ri(6, 15) };
-        Sim.log("Keegi jäi teie jälgi lugema. Kui jälg viib kohale, tulevad nad kohe — või ei tule üldse.", "bad");
+        Sim.log("Someone stayed behind to read your tracks. If the trail leads home, they come at once — or not at all.", "bad");
       }
       if (c.type === "hundid") {
         const loss = Math.round(Sim.foodTotal() * 0.25);
         Sim.consumeFood(loss);
-        Sim.log("Põgenesite pimedusse. Hundid võtsid " + loss + " TÜ. Aga kõik on elus, ja see loeb.", "bad");
+        Sim.log("You fled into the dark. The wolves took " + loss + " food. But everyone is alive, and that counts.", "bad");
       } else if (c.type === "tagasitoomine") {
         G.faith = Math.max(0, G.faith - 8);
-        Sim.log("Taganemine. Reliikvia jäi nende kätte. Keegi ei ütle midagi, aga kõik mõtlevad sama.", "bad");
+        Sim.log("A retreat. The relic stayed in their hands. Nobody says anything, but everyone is thinking the same thing.", "bad");
       } else {
         this.raidLoss();
-        Sim.log("Peitsite end metsa. Parem kaotada vara kui inimesi — nii öeldakse, aga öeldes vaadatakse maha.", "bad");
+        Sim.log("You hid in the forest. Better to lose goods than people — so they say, though they say it looking at the ground.", "bad");
       }
       G.rep = Math.max(0, G.rep - 6);
     } else if (result === "kaotus") {
       if (c.type === "hundid") {
         const loss = Math.round(Sim.foodTotal() * 0.25);
         Sim.consumeFood(loss);
-        Sim.log("Hundid said, mida tahtsid.", "bad");
+        Sim.log("The wolves got what they came for.", "bad");
       } else if (c.type === "tagasitoomine") {
         G.faith = Math.max(0, G.faith - 12);
-        Sim.log("Retk lõppes verega ja tühjade kätega.", "bad");
+        Sim.log("The raid ended in blood and empty hands.", "bad");
       } else {
         this.raidLoss();
       }
       G.rep = Math.max(0, G.rep - 10);
     } else if (result === "viik") {
-      Sim.log("Pimedus lahutas pooled. Kumbki ei võitnud, mõlemad kaotasid.", "bad");
+      Sim.log("The dark separated them. Neither side won, both lost.", "bad");
     }
 
     // veretasu: tapetud vastased jätavad kohustuse (kui on veel keegi, kes seda kannab)
     if (nb && c.enemiesKilled > 0 && c.type !== "hundid" && !G.over) {
       nb.att = Math.max(0, nb.att - 12 * c.enemiesKilled);
-      nb.debts.push("Tapsime " + c.enemiesKilled + " nende meest (" + G.year + ". aasta " + Sim.seasonName() + ")");
+      nb.debts.push("We killed " + c.enemiesKilled + " of theirs (" + Sim.seasonName() + ", year " + G.year + ")");
       const wantsVengeance = U.chance(0.55);
       G.combat = null;
       Bridge.onCombatEnd && Bridge.onCombatEnd();
       Sim.emit({
-        title: "Veri nõuab verd",
-        body: "Te tapsite " + c.enemiesKilled + " nende meest. " + nb.name + " ei unusta seda — iga surm on nimeline kohustus, mis ei kustu ise.\n\nKohustuse saab lahendada kolmel viisil, ja kaks neist maksavad.",
+        title: "Blood calls for blood",
+        body: "You killed " + c.enemiesKilled + " of theirs. " + nb.name + " will not forget it — every death is a debt with a name on it, and it does not clear itself.\n\nThe debt can be settled three ways, and two of them cost.",
         choices: [
-          { label: "Saadame hüvitise (25 TÜ toitu)", sub: "Kallis, aga lõpetab spiraali", fx: () => {
+          { label: "Send compensation (25 food)", sub: "Expensive, but it ends the spiral", fx: () => {
             if (Sim.foodTotal() >= 25) {
               Sim.consumeFood(25);
               nb.att = Math.min(100, nb.att + 20);
               nb.vengeance = false;
-              nb.debts.push("Hüvitis makstud (" + G.year + ". aasta)");
-              Sim.log("Hüvitis viidi neile ja võeti vastu. Veri on kinni makstud. Seekord.", "evt");
+              nb.debts.push("Compensation paid (year " + G.year + ")");
+              Sim.log("The compensation was carried to them and accepted. The blood is paid for. This time.", "evt");
             } else {
               nb.vengeance = wantsVengeance;
-              Sim.log("Hüvitiseks ei jätkunud toitu. Kohustus jääb õhku rippuma.", "bad");
+              Sim.log("There was not enough food for compensation. The debt hangs in the air.", "bad");
             }
           } },
-          { label: "Ei maksa midagi", sub: "Odav täna. Kallis hiljem.", fx: () => {
+          { label: "Pay nothing", sub: "Cheap today. Costly later.", fx: () => {
             nb.vengeance = wantsVengeance;
-            Sim.log("Te ei saatnud midagi. Noored mehed kiitsid sind. Vanad vaatasid tulle ja vaikisid.", "evt");
+            Sim.log("You sent nothing. The young men praised you. The old ones looked into the fire and said nothing.", "evt");
           } },
         ],
         def: 0,
@@ -433,12 +433,12 @@ const Combat = {
       const r = U.pick(G.relics);
       G.relics.splice(G.relics.indexOf(r), 1);
       G.stolenRelic = { key: r.key, name: r.name, neighborId: c ? c.neighborId : 0 };
-      extra = " Nad viisid kaasa reliikvia: " + r.name + "!";
+      extra = " They carried off a relic: " + r.name + "!";
       G.faith = Math.max(0, G.faith - 12);
     }
     Sim.log(bare
-      ? "Küla jäi päriselt lahtiseks. Nad tühjendasid laagri rahulikult: " + loss + " TÜ." + extra
-      : "Nad võtsid, mida kanda jõudsid: " + loss + " TÜ. Metsa peitunud rahvas hoidis hinge kinni." + extra, "bad");
+      ? "The camp was left truly open. They emptied it at their leisure: " + loss + " food." + extra
+      : "They took what they could carry: " + loss + " food. The people hidden in the forest held their breath." + extra, "bad");
   },
 
   // Sõjaretke tulemus. Saak tuleb LANGENUTELT (rõivad, varustus); suur loot ainult
@@ -446,7 +446,7 @@ const Combat = {
   // peitub ülejäänud rahvas metsa. Kaotuse/põgenemise järel võidakse teid jälitada.
   finishRaid(result, c) {
     const op = G.raidOp;
-    const village = op ? op.village : { name: c.tribeName || "küla", pop: 10 };
+    const village = op ? op.village : { name: c.tribeName || "the camp", pop: 10 };
 
     if (result === "voit") {
       const carry = Math.max(1, c.units.filter(u => u.side === "meie" && u.hp > 0 && !u.fled).length) * DATA.RAIDOP.CARRY_PER_RAIDER;
@@ -477,15 +477,15 @@ const Combat = {
       G.rep = Math.min(100, G.rep + 4);
       G.stats.raidsMade = (G.stats.raidsMade || 0) + 1;
       G.score += DATA.SCORE.RAID;
-      Sim.log("Küla on teie käes. " + (bare ? village.name + " jäi päriselt lahtiseks — võtate, mida kanda jõuate." :
-        "Ülejäänud rahvas kadus metsa; võtate langenuilt, mida saab.") + " Nüüd koju, enne kui keegi järele tuleb.", "good");
+      Sim.log("The camp is yours. " + (bare ? village.name + " was left truly open — you take what you can carry." :
+        "The rest of them vanished into the forest; you take what you can off the fallen.") + " Now home, before anyone follows.", "good");
     } else {
       // kaotus või põgenemine: tühjade kätega, ja keegi võib jälgi lugema jääda
       if (U.chance(DATA.RAIDOP.TRACK_P)) {
         G.pursuit = { neighborId: null, tribeName: village.name, days: U.ri(6, 15) };
-        Sim.log("Taganesite. Keegi " + village.name + " hulgast jäi teie jälgi lugema.", "bad");
+        Sim.log("You pulled back. Someone from " + village.name + " stayed to read your tracks.", "bad");
       } else {
-        Sim.log("Taganesite. Metsad on suured ja jäljed kadusid — seekord.", "bad");
+        Sim.log("You pulled back. The forests are wide and the tracks were lost — this time.", "bad");
       }
       G.rep = Math.max(0, G.rep - 4);
     }
@@ -498,7 +498,7 @@ const Combat = {
         op.days = op.dist;
       } else {
         G.raidOp = null;
-        Sim.log("Sõjaretkelt ei tulnud tagasi kedagi. Laager ootas asjata.", "bad");
+        Sim.log("Nobody came back from the raid. The camp waited for nothing.", "bad");
       }
     }
     G.combat = null;

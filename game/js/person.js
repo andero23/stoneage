@@ -77,15 +77,15 @@ const Person = {
 
   statusText(p) {
     const t = [];
-    if (p.child) t.push("laps");
-    if (p.sick) t.push("haige (" + p.sick.name + ", " + p.sick.days + " p)");
-    if (p.wound > 0) t.push("haavatud (" + p.wound + " p)");
-    if (p.hungry >= 2) t.push("näljas");
+    if (p.child) t.push("child");
+    if (p.sick) t.push("sick (" + p.sick.name + ", " + p.sick.days + "d)");
+    if (p.wound > 0) t.push("wounded (" + p.wound + "d)");
+    if (p.hungry >= 2) t.push("hungry");
     if (p.away) {
-      const m = { ring: "eemal (ring " + ((p.away.ring || 1) + 1) + ")", skaut: "luurel", skautraid: "külasid otsimas", raid: "sõjaretkel", retk: "kaugretkel", suurjaht: "suurjahil" };
-      t.push(m[p.away.type] || "eemal");
+      const m = { ring: "away (ring " + ((p.away.ring || 1) + 1) + ")", skaut: "scouting", skautraid: "seeking camps", raid: "on a raid", retk: "on the long journey", suurjaht: "on the great hunt" };
+      t.push(m[p.away.type] || "away");
     }
-    if (!p.clothed) t.push("riieteta");
+    if (!p.clothed) t.push("no clothes");
     return t;
   },
 

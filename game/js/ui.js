@@ -362,12 +362,12 @@ const UI = {
     const away = Sim.alive().filter(p => p.away);
     const el = this.$("away-overlay");
     if (!away.length) { el.textContent = ""; return; }
-    el.innerHTML = "Eemal: " + away.map(p => {
+    el.innerHTML = "Away: " + away.map(p => {
       const a = p.away;
       if (a.type === "ring") return p.name + " (ring " + (a.ring + 1) + ")";
-      if (a.type === "skaut") return p.name + " (luurel, " + a.days + " p)";
-      if (a.type === "retk") return p.name + " (kaugretkel)";
-      if (a.type === "suurjaht") return p.name + " (suurjahil)";
+      if (a.type === "skaut") return p.name + " (scouting, " + a.days + "d)";
+      if (a.type === "retk") return p.name + " (long journey)";
+      if (a.type === "suurjaht") return p.name + " (great hunt)";
       return p.name;
     }).join(", ");
   },
@@ -389,14 +389,14 @@ const UI = {
       const tags = Person.statusText(p);
 
       const relicHead = G.relics.find(r => r.bearerId === p.id);
-      const tagHtml = tags.map(x => (x.includes("haige") || x.includes("haavatud") || x.includes("näljas") || x === "riieteta") ? '<span class="warn">' + x + "</span>" : x).join(" · ") +
+      const tagHtml = tags.map(x => (x.includes("sick") || x.includes("wounded") || x.includes("hungry") || x === "no clothes") ? '<span class="warn">' + x + "</span>" : x).join(" · ") +
         (relicHead ? (tags.length ? " · " : "") + '<span class="relic" title="' + relicHead.origin + '">' + relicHead.name + "</span>" : "");
 
       const head = document.createElement("div");
       head.className = "phead";
-      head.innerHTML = '<span class="pname">' + p.name + '</span><span class="page">' + p.age + "a</span>" +
-        '<span class="psex" title="' + (p.sex === "N" ? "naine" : "mees") + '">' + (p.sex === "N" ? "♀" : "♂") + "</span>" +
-        '<span class="hbar" title="Tervis ' + Math.round(p.health) + '"><span class="hfill" style="width:' + Math.max(0, p.health) + '%;background:' + (p.health > 60 ? "var(--ok)" : p.health > 30 ? "#c9a83c" : "var(--danger)") + '"></span></span>' +
+      head.innerHTML = '<span class="pname">' + p.name + '</span><span class="page">' + p.age + "</span>" +
+        '<span class="psex" title="' + (p.sex === "N" ? "female" : "male") + '">' + (p.sex === "N" ? "♀" : "♂") + "</span>" +
+        '<span class="hbar" title="Health ' + Math.round(p.health) + '"><span class="hfill" style="width:' + Math.max(0, p.health) + '%;background:' + (p.health > 60 ? "var(--ok)" : p.health > 30 ? "#c9a83c" : "var(--danger)") + '"></span></span>' +
         '<span class="ptags">' + tagHtml + "</span>" +
         '<span class="pstat">' + (p.child ? "🧒" : "") + "</span>";
       row.appendChild(head);
@@ -430,11 +430,11 @@ const UI = {
           }
           const kl = Person.skill(p, "kor");
           const pr = Math.round(DATA.POISON.seened.risk[kl] * 100 * 10) / 10;
-          msel.title = "Marjad: ohutu ja etteaimatav.\n" +
-            "Seened: toovad rohkem kui marjad, aga MÜRGIOHT — tema oskusega jõuab vale seen ühisesse patta " + pr + "% päevas. " +
-            "Haigestub JUHUSLIK sööja (ka laps); surm sõltub sööja tervisest" + (Sim.hasShaman() ? " ja šamaan ravib" : " — ja šamaani teil pole") + ". " +
-            "Korjaja oskus vähendab riski järsult: teadmine, milline seen on ohutu, on rühma vara.\n" +
-            "Juured: talvel ainus korilus. Materjal: ehituseks ja erileidudeks. Kuivatab: värske → kuivatatud (vajab raami).";
+          msel.title = "Berries: safe and predictable.\n" +
+            "Mushrooms: more than berries, but POISON RISK — at their skill a bad mushroom reaches the common pot " + pr + "% of days. " +
+            "A RANDOM eater falls ill (a child too); death depends on that eater's health" + (Sim.hasShaman() ? " and the shaman heals" : " — and you have no shaman") + ". " +
+            "The picker's skill cuts the risk sharply: knowing which mushroom is safe is wealth the band owns.\n" +
+            "Roots: the only foraging in winter. Timber: for building and special finds. Drying: fresh → dried (needs a rack).";
           msel.addEventListener("change", () => { p.mode = msel.value; this.refreshAll(true); });
           ctrl.appendChild(msel);
         }
@@ -443,9 +443,9 @@ const UI = {
         skill.className = "skill";
         let traitTxt = "", traitTitle = "";
         const tr = p.traits;
-        if (tr && tr.giftKnown && dom === tr.gift) { traitTxt = " ✦"; traitTitle = " — sünnipärane anne selles valdkonnas"; }
-        if (tr && tr.weakKnown && dom === tr.weak) { traitTxt = " ▿"; traitTitle = " — see töö ei taha talle kätte tulla"; }
-        skill.title = DATA.DOM_NAMES[dom] + ": tase " + lvl + (lvl < 3 ? " (järgmiseni " + Math.round((1 - xpFrac) * 100) + "%)" : " (meister)") + traitTitle;
+        if (tr && tr.giftKnown && dom === tr.gift) { traitTxt = " ✦"; traitTitle = " — born gifted at this"; }
+        if (tr && tr.weakKnown && dom === tr.weak) { traitTxt = " ▿"; traitTitle = " — this work never comes easy to them"; }
+        skill.title = DATA.DOM_NAMES[dom] + ": level " + lvl + (lvl < 3 ? " (" + Math.round((1 - xpFrac) * 100) + "% to next)" : " (master)") + traitTitle;
         skill.textContent = stars + traitTxt;
         ctrl.appendChild(skill);
 
@@ -457,8 +457,8 @@ const UI = {
           btn.className = "ringbtn" + (p.farWork ? " far" : "");
           btn.textContent = "R" + (ring + 1);
           btn.title = p.farWork
-            ? "Otsib kaugemalt (ring " + (ring + 1) + "): vähem saaki, rohkem kogemust ja ohtu. Vajuta, et tuua lähemale."
-            : "Töötab lähimas ringis, kus veel midagi kasvab. Vajuta, et saata kaugemale otsima.";
+            ? "Working further out (ring " + (ring + 1) + "): less yield, more experience and more danger. Tap to bring them closer."
+            : "Working the nearest ring that still grows anything. Tap to send them further out.";
           btn.addEventListener("click", () => { p.farWork = !p.farWork; this.refreshPeople(true); });
           ctrl.appendChild(btn);
         }
@@ -475,80 +475,80 @@ const UI = {
     const site = Sim.curSite();
     let html = "";
 
-    html += '<div class="sechead">' + site.name + " — " + DATA.RICHNESS_NAME(site.rich) + " paik</div>";
+    html += '<div class="sechead">' + site.name + " — a " + DATA.RICHNESS_NAME(site.rich) + " place</div>";
     html += '<div class="bdesc" style="font-size:12px;color:var(--dim);line-height:1.4;margin-bottom:6px">' +
-      (site.river ? "Jõgi annab kala. " : "Vett on vähe: kalapüük kehv. ") +
-      (site.cave ? "Koobas: peavarju 12 inimesele tasuta. " : "") +
-      (site.fishRun ? "KALAJOOKSU KOHT: kevadel erakordne püük. " : "") +
-      "Varjatus: " + DATA.LEVEL_NAME(site.hidden || 0) + " · kaitstavus: " + DATA.LEVEL_NAME(site.defensible || 0) + ". " +
-      "Peavarju: " + Sim.shelterCap() + "/" + Sim.pop() + " inimesele." +
+      (site.river ? "The river gives fish. " : "Little water: poor fishing. ") +
+      (site.cave ? "Cave: free shelter for 12. " : "") +
+      (site.fishRun ? "SPAWNING RUN: extraordinary fishing in spring. " : "") +
+      "Cover: " + DATA.LEVEL_NAME(site.hidden || 0) + " · defensible: " + DATA.LEVEL_NAME(site.defensible || 0) + ". " +
+      "Shelter for " + Sim.shelterCap() + "/" + Sim.pop() + " people." +
       "</div>";
 
     // ratsioonid
-    html += '<div class="bldrow"><div class="bhead"><span class="bname">Ratsioonid</span>' +
-      '<button class="bbtn" id="btn-ration">' + (G.ration === 1 ? "Täis → pool" : "Pool → täis") + "</button></div>" +
-      '<div class="bdesc">Praegu: ' + (G.ration === 1 ? "täisratsioon" : "POOLRATSIOON: varu kestab kauem, aga tervis ja usk kannatavad") + ". Päevakulu: " + U.round1(Sim.dailyNeed()) + " TÜ.</div></div>";
+    html += '<div class="bldrow"><div class="bhead"><span class="bname">Rations</span>' +
+      '<button class="bbtn" id="btn-ration">' + (G.ration === 1 ? "Full → half" : "Half → full") + "</button></div>" +
+      '<div class="bdesc">Now: ' + (G.ration === 1 ? "full rations" : "HALF RATIONS: stores last longer, but health and faith suffer") + ". Daily need: " + U.round1(Sim.dailyNeed()) + " food.</div></div>";
 
-    html += '<div class="sechead">Ehitised</div>';
+    html += '<div class="sechead">Buildings</div>';
     if (G.buildQueue.length) {
       const hasM = Sim.adults().some(p => p.job === "meister" && Person.canWork(p));
-      html += '<div class="buildq">Ehitamisel:' +
-        (hasM ? "" : " <span style='color:var(--danger)'>VAJA ON MEISTRIT!</span>") + "</div>";
+      html += '<div class="buildq">Under construction:' +
+        (hasM ? "" : " <span style='color:var(--danger)'>YOU NEED A CRAFTER!</span>") + "</div>";
       G.buildQueue.forEach((b, i) => {
         const total = DATA.BUILDINGS[b.key].work;
         const done = U.clamp((total - b.workLeft) / total, 0, 1);
         html += '<div class="progrow"><span class="plabel">' + DATA.BUILDINGS[b.key].name +
-          (i > 0 ? " <span class='dim'>(ootel)</span>" : "") + '</span>' +
+          (i > 0 ? " <span class='dim'>(queued)</span>" : "") + '</span>' +
           '<span class="pbar"><span class="pfill" style="width:' + Math.round(done * 100) + '%"></span></span>' +
-          '<span class="pval">' + Math.round(done * 100) + "% · " + Math.ceil(b.workLeft) + " tp</span></div>";
+          '<span class="pval">' + Math.round(done * 100) + "% · " + Math.ceil(b.workLeft) + " wd</span></div>";
       });
     }
     for (const key in DATA.BUILDINGS) {
       const def = DATA.BUILDINGS[key];
       const n = site.b[key];
       html += '<div class="bldrow"><div class="bhead"><span class="bname">' + def.name + '</span><span class="bcount">' + (def.max > 1 ? n + "/" + def.max : (n ? "✓" : "—")) + "</span>" +
-        '<button class="bbtn" data-build="' + key + '"' + (n >= def.max ? " disabled" : "") + ">Ehita</button></div>" +
+        '<button class="bbtn" data-build="' + key + '"' + (n >= def.max ? " disabled" : "") + ">Build</button></div>" +
         '<div class="bdesc">' + def.desc + "</div>" +
-        '<div class="bcost">' + def.mat + " materjali + " + def.work + " tööpäeva (meister). Lahkumisel kaob: " + def.leave + (def.halfBack ? " (pool materjali saab tagasi)" : "") + "</div></div>";
+        '<div class="bcost">' + def.mat + " timber + " + def.work + " work-days (crafter). Lost on leaving: " + def.leave + (def.halfBack ? " (half the timber comes back)" : "") + "</div></div>";
     }
 
-    html += '<div class="sechead">Talveriided</div>';
-    html += '<div class="bldrow"><div class="bhead"><span class="bname">Riietatud: ' + Sim.alive().filter(p => p.clothed).length + "/" + Sim.pop() + "</span>" +
-      '<button class="bbtn" id="btn-clothes">Õmble (' + DATA.CLOTHES_HIDES + ' nahka)</button></div>' +
-      '<div class="bdesc">Meister õmbleb komplekti ' + DATA.CLOTHES_WORK + " tööpäevaga. Ilma meistrita tehakse seda õhtuti, palju aeglasemalt. Järjekorras: " + G.clothQueue + ". Riieteta inimene külmub talvel.</div>" +
-      (G.clothQueue > 0 ? '<div class="progrow"><span class="plabel">Talveriided</span>' +
+    html += '<div class="sechead">Winter clothes</div>';
+    html += '<div class="bldrow"><div class="bhead"><span class="bname">Clothed: ' + Sim.alive().filter(p => p.clothed).length + "/" + Sim.pop() + "</span>" +
+      '<button class="bbtn" id="btn-clothes">Sew (' + DATA.CLOTHES_HIDES + ' hides)</button></div>' +
+      '<div class="bdesc">A crafter sews a set in ' + DATA.CLOTHES_WORK + " work-days. Without one it is done in the evenings, far slower. Queued: " + G.clothQueue + ". Anyone without clothes freezes in winter.</div>" +
+      (G.clothQueue > 0 ? '<div class="progrow"><span class="plabel">Winter clothes</span>' +
         '<span class="pbar"><span class="pfill" style="width:' + Math.round(U.clamp(G.clothProgress / DATA.CLOTHES_WORK, 0, 1) * 100) + '%"></span></span>' +
         '<span class="pval">' + Math.round(U.clamp(G.clothProgress / DATA.CLOTHES_WORK, 0, 1) * 100) + '%</span></div>' : "") + "</div>";
 
     // sõjavarustus
-    html += '<div class="sechead">Sõjavarustus</div>';
-    html += '<div class="bldrow"><div class="bhead"><span class="bname">Relvi: ' + Sim.gearCount("relv") + " · turviseid: " + Sim.gearCount("turvis") + '</span></div>' +
-      '<div class="bdesc">Leiud ootel: <b>' + G.finds.flint + '</b> erilist kivi (kaugemalt materjalikorjelt), <b>' + G.finds.bone + '</b> suurt luud (suurjahilt, suursaagilt). ' +
-      "Varustus kulub lahingus (" + DATA.GEAR.WEAR_PER_FIGHT + "/lahing) — pidev hankimine on paratamatus." +
+    html += '<div class="sechead">War gear</div>';
+    html += '<div class="bldrow"><div class="bhead"><span class="bname">Weapons: ' + Sim.gearCount("relv") + " · armour: " + Sim.gearCount("turvis") + '</span></div>' +
+      '<div class="bdesc">Finds waiting: <b>' + G.finds.flint + '</b> special stones (from timber work further out), <b>' + G.finds.bone + '</b> great bones (from the great hunt, from big kills). ' +
+      "Gear wears out in battle (" + DATA.GEAR.WEAR_PER_FIGHT + "/fight) — resupply never ends." +
       "</div>" +
       (G.gearQueue.length ? (function(){
         const q = G.gearQueue[0];
         const need = q.kind === "relv" ? DATA.GEAR.WEAPON.work : DATA.GEAR.ARMOR.work;
         const d = U.clamp(G.gearProgress / need, 0, 1);
-        return '<div class="progrow"><span class="plabel">' + (q.kind === "relv" ? "Relv" : "Turvis") +
+        return '<div class="progrow"><span class="plabel">' + (q.kind === "relv" ? "Weapon" : "Armour") +
           (G.gearQueue.length > 1 ? " <span class='dim'>(+" + (G.gearQueue.length - 1) + ")</span>" : "") + '</span>' +
           '<span class="pbar"><span class="pfill" style="width:' + Math.round(d * 100) + '%"></span></span>' +
           '<span class="pval">' + Math.round(d * 100) + '%</span></div>';
       })() : "") +
-      '<div class="bcost"><button id="btn-gear-relv">Sepista relv (1 kivileid + 2 mat, 2 tp)</button> ' +
-      '<button id="btn-gear-turvis">Turvis (2 luud + 2 nahka, 3 tp)</button></div></div>';
+      '<div class="bcost"><button id="btn-gear-relv">Forge weapon (1 stone + 2 timber, 2 wd)</button> ' +
+      '<button id="btn-gear-turvis">Armour (2 bones + 2 hides, 3 wd)</button></div></div>';
 
     // kuivatamine
     const dryers = Sim.alive().filter(p => p.job === "korilane" && p.mode === "kuivatab").length;
-    html += '<div class="sechead">Kuivatamine</div>';
-    html += '<div class="bldrow"><div class="bdesc">Raame: ' + site.b.raam + " (maht " + site.b.raam * DATA.RACK_CAP + " TÜ, kuivatatud laos " + Math.floor(G.dried) + " TÜ). Kuivatajaid: " + dryers +
-      (site.b.raam && !dryers ? ' — <span style="color:var(--danger)">keegi ei kuivata! Määra korilane režiimile "kuivatab".</span>' : "") + "</div></div>";
+    html += '<div class="sechead">Drying</div>';
+    html += '<div class="bldrow"><div class="bdesc">Racks: ' + site.b.raam + " (capacity " + site.b.raam * DATA.RACK_CAP + ", dried in store " + Math.floor(G.dried) + "). Drying: " + dryers +
+      (site.b.raam && !dryers ? ' — <span style="color:var(--danger)">nobody is drying! Set a forager to "drying food".</span>' : "") + "</div></div>";
 
     // lahkumise hind
-    html += '<div class="sechead">Lahkumise hind: ' + Sim.leaveCost() + "</div>";
-    html += '<div class="bdesc" style="font-size:12px;color:var(--dim);line-height:1.4">Iga ehitis on samm vabaduse loovutamise suunas. Kolides jääb see kõik maha' +
-      (site.b.pyha ? ", pühapaigast lahkumine raputab usku" : "") +
-      (site.graves ? ", kalmed (" + site.graves + ") jäävad valvama tühja kohta" : "") + ".</div>";
+    html += '<div class="sechead">Cost of leaving: ' + Sim.leaveCost() + "</div>";
+    html += '<div class="bdesc" style="font-size:12px;color:var(--dim);line-height:1.4">Every building is a step away from freedom. Move, and all of it stays behind' +
+      (site.b.pyha ? ", and leaving a shrine shakes the faith" : "") +
+      (site.graves ? ", and the graves (" + site.graves + ") are left guarding an empty place" : "") + ".</div>";
 
     page.innerHTML = html;
 
@@ -584,50 +584,50 @@ const UI = {
     let html = "";
 
     const feast = Sim.canFeast();
-    html += this.actHtml("Pidu", "pidu", feast.ok,
-      "Kulutab " + Math.ceil(Sim.pop() * DATA.FEAST_COST_PER_POP) + " TÜ toitu. Maine ja usk tõusevad, lahkumissurve langeb, naabrid tulevad külla — ja loevad su varusid üle.",
+    html += this.actHtml("Feast", "pidu", feast.ok,
+      "Costs " + Math.ceil(Sim.pop() * DATA.FEAST_COST_PER_POP) + " food. Renown and faith rise, the urge to leave falls, neighbours come to visit — and count your stores.",
       feast.ok ? null : feast.why);
 
     const rit = Sim.canRitual();
     for (const t of DATA.RITUAL_TYPES) {
       html += this.actHtml(DATA.RITUAL_NAMES[t], "rit-" + t, rit.ok,
-        "Šamaan ohverdab " + DATA.RITUAL_COST + " TÜ. Kas see mõjub? Šamaan ütleb, et mõjub. Tõestust ei tule kunagi.",
+        "The shaman offers up " + DATA.RITUAL_COST + " food. Does it work? The shaman says it works. Proof never comes.",
         rit.ok ? null : rit.why);
     }
 
     const sj = Sim.canSuurjaht();
-    html += this.actHtml("Suurjaht", "suurjaht", sj.ok,
-      "4–6 inimest, 3 päeva, suur loom: palju liha ja nahku, võimalus reliikviaks. Keegi tuleb tõenäoliselt haavatuna tagasi.",
+    html += this.actHtml("Great hunt", "suurjaht", sj.ok,
+      "4–6 people, 3 days, one big animal: meat and hides in quantity, a chance at a relic. Someone will probably come back wounded.",
       sj.ok ? null : sj.why);
 
     const kr = Sim.canKaugretk();
-    html += this.actHtml("Kaugretk", "kaugretk", kr.ok,
-      "3 sõdalast + 3 kütti, 12 päeva kaugetel jahimaadel. Palju toitu, EI ammenda kodu ümbrust. Küla jääb nõrgaks. Iga retk kurnab kaugalasid.",
+    html += this.actHtml("Long journey", "kaugretk", kr.ok,
+      "3 warriors + 3 hunters, 12 days in far hunting grounds. Much food, and it does NOT deplete the land around home. The camp is left weak. Each journey wears the far country down.",
       kr.ok ? null : kr.why);
 
     const sr = Sim.canScoutRaid();
-    html += this.actHtml("Otsi raiditavaid külasid", "skautraid", sr.ok,
-      "Skaut käib kaugetel radadel võõraid külasid otsimas (6–12 päeva, ohtlik). Kui ta midagi leiab, tuleb otsustada KOHE: ründad või mitte — hiljem seda võimalust ei ole. Saak tuleb langenutelt; kaotuse järel võidakse teid koju jälitada.",
+    html += this.actHtml("Look for camps to raid", "skautraid", sr.ok,
+      "A scout walks the far paths looking for strangers' camps (6–12 days, dangerous). If they find something, you must decide THEN AND THERE: attack or not — the chance does not come back. Loot comes off the fallen; lose, and you may be tracked home.",
       sr.ok ? null : sr.why);
 
     if (G.stolenRelic) {
       const rt = Events.canRetrieve();
-      html += this.actHtml("Too reliikvia tagasi: " + G.stolenRelic.name, "retrieve", rt.ok,
-        "Röövretk nende laagrisse. Parim põhjus sõjaks, mida see ajastu tunneb. Veri toob verd.",
+      html += this.actHtml("Take back the relic: " + G.stolenRelic.name, "retrieve", rt.ok,
+        "A raid on their camp. The best reason for war this age knows. Blood brings blood.",
         rt.ok ? null : rt.why);
     }
 
     // reliikviad
-    html += '<div class="sechead">Reliikviad (' + G.relics.length + ")</div>";
-    if (!G.relics.length) html += '<div class="bdesc" style="color:var(--dim);font-size:12px">Veel ei ole. Reliikviad tulevad suurelt jahilt, matustelt, kauplejatelt ja võitudest.</div>';
+    html += '<div class="sechead">Relics (' + G.relics.length + ")</div>";
+    if (!G.relics.length) html += '<div class="bdesc" style="color:var(--dim);font-size:12px">None yet. Relics come from the great hunt, from burials, from traders, and from victories.</div>';
     G.relics.forEach((r, i) => {
       const bearer = r.bearerId !== null ? G.people.find(p => p.id === r.bearerId && p.alive) : null;
       const def = DATA.RELICS[r.key];
       html += '<div class="act"><div class="ahead"><span class="aname" style="color:var(--faith)">' + r.name + "</span></div>" +
         '<div class="adesc">' + r.origin + "<br>" + def.desc +
-        (def.job ? "<br>Kuulub ametile: " + DATA.JOBS[def.job].name + "." : "") +
-        "<br>Kandja: " + (bearer ? bearer.name : (Sim.curSite().b.pyha ? "pühapaigas (annab usku)" : "ilma kandjata")) + "</div>" +
-        '<select data-relic="' + i + '"><option value="">— anna üle (5 TÜ) —</option>' +
+        (def.job ? "<br>Belongs to the " + DATA.JOBS[def.job].name + "." : "") +
+        "<br>Held by: " + (bearer ? bearer.name : (Sim.curSite().b.pyha ? "the shrine (gives faith)" : "nobody")) + "</div>" +
+        '<select data-relic="' + i + '"><option value="">— hand it over (5 food) —</option>' +
         Sim.adults().filter(p => !def.job || p.job === def.job).map(p => '<option value="' + p.id + '">' + p.name + " (" + DATA.JOBS[p.job].name + ")</option>").join("") +
         "</select></div>";
     });
@@ -652,7 +652,7 @@ const UI = {
 
   actHtml(name, act, ok, desc, why) {
     return '<div class="act"><div class="ahead"><span class="aname">' + name + '</span>' +
-      '<button class="abtn" data-act="' + act + '"' + (ok ? "" : " disabled") + ">Tee</button></div>" +
+      '<button class="abtn" data-act="' + act + '"' + (ok ? "" : " disabled") + ">Do it</button></div>" +
       '<div class="adesc">' + desc + "</div>" +
       (why ? '<div class="areq">' + why + "</div>" : "") + "</div>";
   },
@@ -662,55 +662,55 @@ const UI = {
     const page = this.$("tab-kaart");
     let html = '<canvas id="region-canvas" width="340" height="230"></canvas>';
 
-    html += '<div class="bdesc" style="font-size:11px;color:var(--dim);margin:4px 0">Klõpsa paigale. Liikumisaken: ' +
-      (Sim.moveWindowOpen() ? '<span style="color:var(--ok)">LAHTI</span>' : '<span style="color:var(--danger)">kinni (kevad + sügise algus)</span>') + "</div>";
+    html += '<div class="bdesc" style="font-size:11px;color:var(--dim);margin:4px 0">Tap a place. Moving window: ' +
+      (Sim.moveWindowOpen() ? '<span style="color:var(--ok)">OPEN</span>' : '<span style="color:var(--danger)">shut (spring + early autumn)</span>') + "</div>";
 
     if (this.selectedSite !== null) {
       const s = G.sites[this.selectedSite];
       const dist = World.distDays(Sim.curSite(), s);
       html += '<div class="sitecard"><div class="sname">' + (s.special ? "✦ " : "") + s.name +
-        (s.id === G.campId ? " (praegune kodu)" : "") + "</div>" +
-        (s.special ? '<span style="color:#5ad0c0">Erikoht: sellistest räägitakse sosinal. Vaikselt elades püsid siin peidus — aga kasv ja rikkus paistavad igalt poolt.</span><br>' : "");
-      if (s.known === 0) html += "Tundmatu paik. Ainult skaut saab teada, mis seal on.";
-      else if (s.known === 1) html += "Kuuldused: keegi on seda paika maininud. Rikkusest ei tea keegi midagi.";
+        (s.id === G.campId ? " (home)" : "") + "</div>" +
+        (s.special ? '<span style="color:#5ad0c0">A place people mention in whispers. Live quietly and you stay hidden here — but growth and wealth show from everywhere.</span><br>' : "");
+      if (s.known === 0) html += "Unknown ground. Only a scout can find out what is there.";
+      else if (s.known === 1) html += "Hearsay: someone has mentioned this place. Nobody knows how rich it is.";
       else {
-        html += "Rikkus: " + DATA.RICHNESS_NAME(s.estRich || s.rich) + (s.estRich !== s.rich ? " (skaudi hinnang)" : "") + ".";
+        html += "Richness: " + DATA.RICHNESS_NAME(s.estRich || s.rich) + (s.estRich !== s.rich ? " (the scout's guess)" : "") + ".";
         const feat = [];
-        if (s.river) feat.push("jõgi");
-        if (s.cave) feat.push("koobas (peavari tasuta)");
-        if (s.fishRun) feat.push("kalajooksu koht");
-        feat.push("varjatus " + DATA.LEVEL_NAME(s.hidden || 0));
-        feat.push("kaitstavus " + DATA.LEVEL_NAME(s.defensible || 0));
+        if (s.river) feat.push("river");
+        if (s.cave) feat.push("cave (free shelter)");
+        if (s.fishRun) feat.push("spawning run");
+        feat.push(DATA.LEVEL_NAME(s.hidden || 0) + " cover");
+        feat.push(DATA.LEVEL_NAME(s.defensible || 0) + " to defend");
         if (feat.length) html += "<br>" + feat.join(", ") + ".";
-        if (s.b.onn || s.b.raam || s.b.pyha) html += "<br>Vanad ehitised on alles.";
-        if (s.graves) html += "<br>Kalmed: " + s.graves + " — esivanemad on siin.";
+        if (s.b.onn || s.b.raam || s.b.pyha) html += "<br>Old buildings still stand.";
+        if (s.graves) html += "<br>Graves: " + s.graves + " — ancestors lie here.";
       }
       if (s.occupied !== null && s.known >= 1) {
         const n = G.neighbors[s.occupied];
-        html += "<br>Siin elab: <b>" + n.name + "</b> (" + this.attText(n.att) + ")";
+        html += "<br>Lived in by <b>" + n.name + "</b> (" + this.attText(n.att) + ")";
       }
       if (s.id !== G.campId) {
-        html += "<br>Teekond: ~" + dist + " päeva.";
+        html += "<br>Journey: about " + dist + " days.";
         const sc = Sim.canScout(s.id);
         const mv = Sim.canMove(s.id);
         html += "<br>";
-        html += '<button id="btn-scout"' + (sc.ok ? "" : " disabled") + ' title="' + (sc.ok ? "Skaut käib ära " + dist * 2 + " päevaga" : sc.why) + '">Saada skaut</button>';
-        html += '<button id="btn-move"' + (mv.ok ? "" : " disabled") + ' title="' + (mv.ok ? "Kogu hõim asub teele" : mv.why) + '">Koli siia</button>';
+        html += '<button id="btn-scout"' + (sc.ok ? "" : " disabled") + ' title="' + (sc.ok ? "A scout makes the trip in " + dist * 2 + " days" : sc.why) + '">Send a scout</button>';
+        html += '<button id="btn-move"' + (mv.ok ? "" : " disabled") + ' title="' + (mv.ok ? "The whole band takes to the road" : mv.why) + '">Move here</button>';
         if (Sim.hasShaman() && s.known >= 1 && s.id !== G.campId) {
-          html += '<button id="btn-omen" title="Šamaan loeb märke selle teekonna kohta">Küsi endeid</button>';
+          html += '<button id="btn-omen" title="The shaman reads the signs for this journey">Ask for omens</button>';
         }
       }
       html += "</div>";
     }
 
     // naabrid ja kohustused
-    html += '<div class="sechead">Naabrid ja kohustused</div>';
+    html += '<div class="sechead">Neighbours and debts</div>';
     const known = G.neighbors.filter(n => n.known);
-    if (!known.length) html += '<div class="bdesc" style="color:var(--dim);font-size:12px">Te ei ole veel kedagi kohanud. Aga keegi on kuskil alati.</div>';
+    if (!known.length) html += '<div class="bdesc" style="color:var(--dim);font-size:12px">You have met nobody yet. But somebody is always somewhere.</div>';
     for (const n of known) {
       html += '<div class="nbrow"><b>' + n.name + "</b> (" + G.sites[n.siteId].name + ") — " + this.attText(n.att) +
-        (n.vengeance ? ' · <span style="color:var(--danger)">VERI OOTAB VERD</span>' : "") +
-        (n.debts.length ? '<br><span class="dim">Kohustuste raamat: ' + n.debts.join("; ") + "</span>" : "") + "</div>";
+        (n.vengeance ? ' · <span style="color:var(--danger)">BLOOD AWAITS BLOOD</span>' : "") +
+        (n.debts.length ? '<br><span class="dim">The book of debts: ' + n.debts.join("; ") + "</span>" : "") + "</div>";
     }
 
     page.innerHTML = html;
@@ -739,7 +739,7 @@ const UI = {
   },
 
   attText(att) {
-    return att >= 70 ? "sõbralik" : att >= 45 ? "ettevaatlik" : att >= 25 ? "umbusklik" : "vaenulik";
+    return att >= 70 ? "friendly" : att >= 45 ? "wary" : att >= 25 ? "distrustful" : "hostile";
   },
 
   confirmMove(siteId) {
@@ -749,16 +749,16 @@ const UI = {
     const dist = World.distDays(Sim.curSite(), s);
     const cost = Sim.leaveCost();
     this.queueModal({
-      title: "Jääda või liikuda?",
-      body: "Kogu hõim asub teele paika " + s.name + " (~" + dist + " päeva).\n\n" +
-        "Maha jääb: kõik ehitised (lahkumise hind " + cost + ")" +
-        (Sim.curSite().b.pyha ? ", pühapaik (usk langeb!)" : "") +
-        (Sim.curSite().graves ? ", " + Sim.curSite().graves + " kalmet" : "") +
-        ".\nKaasa mahub piiratud kogus varusid (kuivatatut ~" + Sim.pop() * 8 + " TÜ).\n\n" +
-        "Teekond on ohtlik, eriti nõrkadele. Aga uus koht õpetab ja toidab.\n\nSeda otsust ei saa tagasi võtta.",
+      title: "Stay or roam?",
+      body: "The whole band takes to the road for " + s.name + " (about " + dist + " days).\n\n" +
+        "Left behind: every building (cost of leaving " + cost + ")" +
+        (Sim.curSite().b.pyha ? ", the shrine (faith will fall!)" : "") +
+        (Sim.curSite().graves ? ", " + Sim.curSite().graves + " graves" : "") +
+        ".\nOnly so much can be carried (about " + Sim.pop() * 8 + " dried food).\n\n" +
+        "The journey is dangerous, above all for the weak. But a new place teaches and feeds.\n\nThis choice cannot be taken back.",
       choices: [
-        { label: "Läheme", fx: () => { T.log("action", { a: "kolimine" }); Sim.startJourney(siteId); } },
-        { label: "Jääme veel", fx: () => {} },
+        { label: "We go", fx: () => { T.log("action", { a: "kolimine" }); Sim.startJourney(siteId); } },
+        { label: "We stay a while", fx: () => {} },
       ],
       def: 1,
     });
@@ -766,21 +766,21 @@ const UI = {
 
   askOmen(siteId) {
     const s = G.sites[siteId];
-    if (s.omenAsked) { this.logLine("Šamaan on selle koha kohta juba endeid küsinud.", "bad"); return; }
+    if (s.omenAsked) { this.logLine("The shaman has already read the signs for that place.", "bad"); return; }
     s.omenAsked = true;
     const truth = s.rich >= 60;
     let told = U.chance(0.65) ? truth : !truth;
     if (Sim.relicBearer("merevaik")) told = U.chance(0.8) ? truth : !truth;
-    const good = ["Linnud lendasid sinnapoole kahes reas. See on hea märk.",
-      "Unes oli see org täis hirvi. Šamaan ärkas naeratades.",
-      "Sisikond oli puhas ja tume. Maa seal on lahke."];
-    const bad = ["Ronk keeras selle koha kohal ringi ja tuli tagasi. Šamaan vaikis kaua.",
-      "Unes oli seal ainult tuul. Mitte ühtegi looma, mitte ühtegi häält.",
-      "Sisikond oli täpiline. Šamaan mattis selle kiiresti maha."];
+    const good = ["The birds flew that way in two lines. That is a good sign.",
+      "In the dream that valley was full of deer. The shaman woke smiling.",
+      "The entrails were clean and dark. The land there is kind."];
+    const bad = ["The raven circled over that place and came back. The shaman was silent a long time.",
+      "In the dream there was only wind there. Not one animal, not one sound.",
+      "The entrails were spotted. The shaman buried them quickly."];
     this.queueModal({
-      title: "Ended: " + s.name,
-      body: (told ? U.pick(good) : U.pick(bad)) + "\n\nMärgid on märgid. Keegi ei tea, kas nad räägivad tõtt — aga kes neid eirab, sellest räägitakse lugusid.",
-      choices: [{ label: "Võtame teadmiseks", fx: () => {} }],
+      title: "Omens: " + s.name,
+      body: (told ? U.pick(good) : U.pick(bad)) + "\n\nSigns are signs. Nobody knows whether they tell the truth — but stories get told about those who ignore them.",
+      choices: [{ label: "We will remember it", fx: () => {} }],
       def: 0,
     });
   },
@@ -853,8 +853,8 @@ const UI = {
     this.combatSel = null;
     this.combatTarget = null;
     this.$("combat-back").classList.remove("hidden");
-    const t = { hundid: "Hundid küla juures", haarang: "Öine haarang", tagasitoomine: "Röövretk reliikvia järele" };
-    this.$("combat-title").textContent = t[G.combat.type] || "Kokkupõrge";
+    const t = { hundid: "Wolves at the camp", haarang: "Night raid", tagasitoomine: "Raid for the relic" };
+    this.$("combat-title").textContent = t[G.combat.type] || "Encounter";
     this.drawCombat();
   },
 
@@ -977,20 +977,20 @@ const UI = {
     if (conf) {
       const show = !!(tgt && sel && !c.over);
       conf.classList.toggle("show", show);
-      if (show) conf.textContent = "⚔ Ründa: " + tgt.name;
+      if (show) conf.textContent = "⚔ Attack: " + tgt.name;
     }
 
     // info
     const info = this.$("combat-info");
     if (c.over) {
-      info.textContent = "Lahing on läbi.";
+      info.textContent = "The fight is over.";
     } else if (sel) {
       info.textContent = sel.name + " (" + sel.wpn + ", ulatus " + Combat.effRange(sel) +
-        (Combat.onHill(sel) ? " KÜNKAL" : "") + ", " + sel.hp + "/" + sel.maxhp + " HP)" +
-        (sel.moved ? " · liikunud" : " · saab liikuda") + (sel.acted ? " · rünnanud" : " · saab rünnata") +
-        " — käik " + c.round;
+        (Combat.onHill(sel) ? " ON THE HILL" : "") + ", " + sel.hp + "/" + sel.maxhp + " HP)" +
+        (sel.moved ? " · has moved" : " · can move") + (sel.acted ? " · has attacked" : " · can attack") +
+        " — round " + c.round;
     } else {
-      info.textContent = "Vali oma võitleja (klõpsa). Käik " + c.round + ". Kaugvõitlejad hoia taga, sõdalane ette.";
+      info.textContent = "Pick one of your fighters (tap them). Round " + c.round + ". Keep the ranged ones back, the warrior in front.";
     }
     const log = this.$("combat-log");
     log.innerHTML = c.log.slice(-6).map(l => "<div>" + l + "</div>").join("");

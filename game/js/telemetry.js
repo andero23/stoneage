@@ -88,10 +88,10 @@ const T = {
     if (document.getElementById("fb-box")) return;
     const div = document.createElement("div");
     div.id = "fb-box";
-    div.innerHTML = '<div class="fb-inner"><b>Tagasiside</b>' +
-      '<p>Mis jäi segaseks? Mis meeldis, mis häiris? Paar lauset aitab palju.</p>' +
+    div.innerHTML = '<div class="fb-inner"><b>Feedback</b>' +
+      '<p>What was confusing? What worked, what annoyed you? A couple of sentences helps a lot.</p>' +
       '<textarea id="fb-text" rows="4" maxlength="2000"></textarea>' +
-      '<div class="fb-btns"><button id="fb-send">Saada</button><button id="fb-skip">Jäta vahele</button></div></div>';
+      '<div class="fb-btns"><button id="fb-send">Send</button><button id="fb-skip">Skip</button></div></div>';
     document.body.appendChild(div);
     document.getElementById("fb-send").addEventListener("click", () => {
       const txt = document.getElementById("fb-text").value.trim();
