@@ -5,7 +5,7 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 
-const files = ["util.js", "data.js", "world.js", "person.js", "sim.js", "events.js", "combat.js", "bot.js"];
+const files = ["util.js", "data.js", "world.js", "objectives.js", "person.js", "sim.js", "events.js", "combat.js", "bot.js"];
 for (const f of files) {
   const code = fs.readFileSync(path.join(__dirname, "..", "js", f), "utf8");
   vm.runInThisContext(code, { filename: f });

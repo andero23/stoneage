@@ -66,6 +66,7 @@ const Sim = {
       log: [],
     };
     for (const t of DATA.RITUAL_TYPES) G.ritualFx[t] = U.chance(0.6); // mõni rituaal ei tee mitte midagi
+    Objectives.init();
     G.people.forEach((p, i) => { p.pos.x = 400 + i * 22; p.pos.y = 330; p.pos.tx = p.pos.x; p.pos.ty = p.pos.y; });
     this.log("Teid on viis. Suvi on lahke, aga suvi valetab.", "evt");
     return G;
@@ -196,6 +197,9 @@ const Sim = {
 
     // 9.5. ringitöölised naasevad ööseks laagrisse (retked ja luure jätkuvad)
     for (const p of this.alive()) if (p.away && p.away.type === "ring") p.away = null;
+
+    // 9.6. eesmärkide rada
+    Objectives.tick();
 
     // 10. loodus taastub
     World.regenerate(G.sites, G.campId, G.season);

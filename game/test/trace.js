@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 
-for (const f of ["util.js", "data.js", "world.js", "person.js", "sim.js", "events.js", "combat.js", "bot.js"]) {
+for (const f of ["util.js", "data.js", "world.js", "objectives.js", "person.js", "sim.js", "events.js", "combat.js", "bot.js"]) {
   vm.runInThisContext(fs.readFileSync(path.join(__dirname, "..", "js", f), "utf8"), { filename: f });
 }
 const seed = parseInt(process.argv[2] || "7945");

@@ -161,6 +161,58 @@ raidid; kõvera lõpuosa ei saa häälestada enne, kui need olemas on.
 | 6 | ✅ Varustus (2.6) | 4 | TEHTUD 29.08: erileiud (eriline kivi kaugemalt materjalikorjelt ringi järgi 0,4–2,5%/päev; suured luud suursaagilt 20%, suurjahilt +2, kaugretkelt 50%), meister sepistab (relv: +1–2 kahju +4% tabamine; turvis: +3 HP), kulub 25/lahing, röövitud relvad tulevad raidilt pooleldi kulununa. Reliikviatest rangelt lahus. |
 | 7 | ✅ Skoor (2.7) | — | TEHTUD 29.08 (toodud ette, et balansipass saaks mõõta kõiki stiile): koguneb hooajati (baas 3 + rahvaarv×2 + varad/20 + reliikviad×5 + varustus + talv 15), võidetud sõjaretk +8 ühekordselt. Kuvatakse ülaribal; surm salvestab lokaalsesse rekorditabelisse (top 10); kaalud balansipaneelis. Valem häälestatakse lõplikult etapis 5. |
 | 8 | Võrgumäng (2.8) | kõik | arhitektuuridistsipliin kehtib aga kohe (vt 5) |
+| 9 | **Onboarding: avamiste redel** (vt §6) | — | JÄRGMINE. Simuleeritud 29.08, ehitamata. |
+
+---
+
+## 6. Onboarding: eesmärkide rada (otsustatud ja simuleeritud 29.08)
+
+### Otsused
+- **Toidubilansi näidikut EI TULE** — mängija avastab ja timmib ise; eesmärkide
+  edenemine (nt "kuivata 130 TÜ": 46/130) annab diskreetse tagasiside.
+- **Menüüsid EI PEIDETA** — kogu UI jääb nähtavaks; sisse juhatab eesmärkide jada.
+- **Eesmärkide jada** on onboarding'u selgroog: üks aktiivne eesmärk korraga,
+  täitmine = tähistus + skooripreemia + järgmine.
+
+### Simuleeritud tulemused (60 mängu, "eesmärke järgiv" mängija)
+| Variant | 1.a surnud | pop 3.a alguses | kolinud 4.a-ks |
+|---|---|---|---|
+| Praegu (juhendatud, eesmärkideta) | 42/60 | — | — |
+| Eesmärkide jada | 2/60 | 6 | 51/60 |
+| + kogenud liitujad väikesele rühmale | **1/60** | **10** | **49/60** |
+
+Õppetunnid: (1) kevad-kala eesmärk kukutas 2. aasta näljasurmad 30→4; (2) sündide
+kergendamine tegi asja HULLEMAKS (lapsed söövad, ei tööta) — kasv käib liitujate
+kaudu; (3) liitujate SAGEDUS ei aidanud, KVALITEET aitas.
+
+### Mängumuudatused (3 tk, koos eesmärkidega)
+1. **Kogenud liituja väikesele rühmale:** kuni pop < 10 tuleb rändaja oskusega 1–2
+   toidudomeenis, õige ametiga. Temaatiline: üksi rändab läbi ainult see, kes oskab.
+   Toidupiir vastuvõtuks leebem (6× päevavajadus). Alates pop 10 tavaline (mainepõhine).
+2. **Liitujate aken laiem:** lisašanss ~1%/päev (suvi-sügis) kuni pop 12.
+3. **Skooripreemiad eesmärkide eest** (+10..40, suurim "esimene talv üle elatud").
+
+### Eesmärkide jada (üks korraga; E1–E8 on rada, ülejäänud avanevad olukorrast)
+| # | Eesmärk | Täitmine | Õpetab |
+|---|---|---|---|
+| E1 | "Kogu 20 TÜ toiduvaru" | fresh+dried ≥ 20 | ametid, toit |
+| E2 | "Kogu 8 materjali ja ehita kuivatusraam" | raam valmis | materjal-režiim, meister, ehitus |
+| E3 | "Kuivata talveks 130 TÜ" (progress!) | dried ≥ 130 | kuivatamine, varu SIHT — asendab bilansinäidikut |
+| E4 | "Hangi 4 nahka ja riieta kõik" | kõik riides | kütt, nahad, meister |
+| E5 | "Ehita onn (peavari kõigile)" | shelterCap ≥ pop | onn |
+| E6 | "Ela esimene talv üle" | kevade 1. päev | ratsioonid, juured (vihjed eesmärgi all) — SUUR tähistus |
+| E7 | "Kevadine kalajooks: pane 2 inimest kalale" | 2 kalurit kevadel | hooajad! (kriitiline, vt õppetund 1) |
+| E8 | "Kasvata rühm 8 inimeseni" | pop ≥ 8 | liitujad, maine |
+| E9 | "Saada skaut naaberpaika luurele" | luure õnnestus | kaart |
+| E10 | "Ring 1 tühjeneb — vali uus kodu ja KOLI" (3. aasta paiku) | kolimine tehtud | mängu tuum: jääda või liikuda — SUUR tähistus |
+| E11 | "Ehita uues kodus raam ja ela talv üle" | talv üle elatud | tsükkel kinnistub |
+| — | Olukorrast avanevad: šamaan (unenägu), pühapaik+rituaal, pidu, suurjaht, relv, kaugretk (pop 16), reliikvia kandja | — | vastavad süsteemid |
+
+### Teostus (ehitamisel)
+- `js/objectives.js` (DOM-vaba definitsioonid + kontroll simDay lõpus) + UI-riba
+  kanvase alaosas (aktiivne eesmärk + progress + "✓" animatsioon).
+- Eesmärgi seis salvestub (G.objectives). Kogenud mängijale nupp "peida eesmärgid".
+- Bot-testidesse "eesmärgi-järgija" profiil regressiooniks.
 
 ---
 

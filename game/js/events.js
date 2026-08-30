@@ -42,7 +42,8 @@ const Events = {
 
     // rändaja / liituja (suvi ja sügis); väikese rühmaga liitutakse kergemini
     if ((G.season === 1 || G.season === 2) &&
-        U.chance(0.006 + (G.rep > 50 ? 0.006 : 0) + (Sim.pop() <= DATA.SMALL_BAND_POP ? 0.008 : 0))) {
+        U.chance(0.006 + (G.rep > 50 ? 0.006 : 0) + (Sim.pop() <= DATA.SMALL_BAND_POP ? 0.008 : 0) +
+                 (Sim.pop() < 12 ? 0.010 : 0))) {
       this.wanderer();
     }
 
@@ -190,7 +191,39 @@ const Events = {
 
   // ---------- inimeste tulek ----------
   wanderer() {
-    if (Sim.foodTotal() < Sim.dailyNeed() * 8) return; // näljas hõimuga ei liituta
+    const small = Sim.pop() < 10;
+    if (Sim.foodTotal() < Sim.dailyNeed() * (small ? 6 : 8)) return; // näljas hõimuga ei liituta
+
+    // Väikese rühmaga liitub KOGENUD rändaja: üksi rändab siin maailmas läbi ainult
+    // see, kes oskab. (Simuleeritud: see viib rühma 10-ni ~3. aastaks.)
+    if (small) {
+      const dom = U.pick(["kor", "kala", "jaht"]);
+      const lvl = U.ri(1, 2);
+      const p = Person.create({ id: G.nextId++, age: U.ri(20, 42) });
+      p.xp[dom] = lvl * DATA.XP_PER_LEVEL;
+      p.job = dom === "kor" ? "korilane" : dom === "kala" ? "kalur" : "kytt";
+      Sim.emit({
+        title: "Rändaja",
+        body: p.name + " seisab laagri serval. Ta on üksi rännanud kaua — ja see, et ta elus on, " +
+          "räägib enda eest: tema käed tunnevad " + DATA.DOM_NAMES[dom] + ".\n\n" +
+          "Väike rühm on rändajale sama suur õnn kui tema teile.",
+        choices: [
+          { label: "Võtame vastu", fx: () => {
+            p.pos = { x: 100, y: 300, tx: 480, ty: 320, wander: 0 };
+            G.people.push(p);
+            G.stats.joins++;
+            Sim.log(p.name + " liitus hõimuga. Ta oskab: " + DATA.DOM_NAMES[dom] + " (kogenu).", "good");
+          } },
+          { label: "Saadame minema", sub: "Maine langeb pisut", fx: () => {
+            G.rep = Math.max(0, G.rep - 4);
+            Sim.log("Rändaja saadeti minema. Ta läks, ja tema oskused läksid temaga.", "evt");
+          } },
+        ],
+        def: 0,
+      });
+      return;
+    }
+
     let quality, desc;
     if (G.rep >= 70) {
       quality = 2;

@@ -239,3 +239,26 @@ b { color: #fff; }
 .progrow .pbar { flex: 1; height: 8px; background: #0b0805; border: 1px solid var(--border); display: block; }
 .progrow .pfill { height: 100%; background: var(--accent); display: block; }
 .progrow .pval { flex: 0 0 74px; text-align: right; color: var(--dim); }
+
+/* Eesmärgiriba */
+#obj-bar {
+  position: absolute; right: 8px; bottom: 8px;
+  background: rgba(20,16,12,0.88); border: 1px solid var(--accent); border-radius: 4px;
+  padding: 6px 10px; font-size: 13px; color: var(--accent);
+  display: flex; align-items: center; gap: 8px; max-width: 46%;
+}
+#obj-bar #obj-hide { color: var(--dim); cursor: pointer; font-size: 11px; }
+#obj-bar #obj-hide:hover { color: var(--danger); }
+#obj-toast {
+  position: absolute; left: 50%; top: 38%; transform: translateX(-50%);
+  background: rgba(20,16,12,0.92); border: 2px solid var(--ok); border-radius: 6px;
+  padding: 10px 22px; font-size: 17px; font-weight: bold; color: var(--ok);
+  animation: objpop 4s ease-out forwards; pointer-events: none; z-index: 40;
+}
+@keyframes objpop {
+  0% { transform: translateX(-50%) scale(0.6); opacity: 0; }
+  10% { transform: translateX(-50%) scale(1.1); opacity: 1; }
+  20% { transform: translateX(-50%) scale(1); }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}

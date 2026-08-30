@@ -79,6 +79,12 @@ const UI = {
     this.$("btn-continue").addEventListener("click", () => this.loadGame());
     this.showContinueIfSaved();
 
+    const objHide = this.$("obj-hide");
+    if (objHide) objHide.addEventListener("click", e => {
+      e.stopPropagation();
+      if (G && G.obj) { G.obj.hidden = true; this.refreshObjective(); }
+    });
+
     window.addEventListener("beforeunload", () => this.saveGame());
 
     // telemeetria (vaikib, kui serverit pole)
@@ -168,6 +174,7 @@ const UI = {
         if (st.hidden0 === undefined) st.hidden0 = st.hidden;
       }
       for (const pp of G.people) if (!pp.traits) pp.traits = Person.rollTraits();
+      Objectives.migrate();
       this.clearModals();
       this.$("start-back").style.display = "none";
       this.refreshAll(true);
@@ -252,6 +259,7 @@ const UI = {
     this.refreshTop();
     this.refreshRings();
     this.refreshAway();
+    this.refreshObjective();
     // ära ehita paneeli uuesti, kui kasutaja parasjagu selle sees toimetab
     if (!force) {
       const pg = document.querySelector(".tabpage.active");
@@ -319,6 +327,32 @@ const UI = {
       fill.style.width = Math.round(frac * 100) + "%";
       fill.style.background = frac > 0.5 ? "var(--ok)" : frac > 0.2 ? "#c9a83c" : "var(--danger)";
     }
+  },
+
+  refreshObjective() {
+    const el = this.$("obj-bar");
+    if (!el || !G) return;
+    if (!G.obj) { el.classList.add("hidden"); return; }
+    // tähistus (4 s)
+    const c = G.obj.celebrate;
+    if (c && (G.day - c.day) < 1 && this.lastCelebrated !== c.title) {
+      this.lastCelebrated = c.title;
+      const t = document.createElement("div");
+      t.id = "obj-toast";
+      t.textContent = "✓ " + c.title + "  +" + c.reward + " 🏆";
+      document.getElementById("canvas-wrap").appendChild(t);
+      setTimeout(() => t.remove(), 4000);
+    }
+    const def = Objectives.active();
+    if (!def || G.obj.hidden) { el.classList.add("hidden"); return; }
+    el.classList.remove("hidden");
+    let ptxt = "";
+    if (def.progress) {
+      const pr = def.progress();
+      ptxt = " · " + pr.cur + "/" + pr.max;
+    }
+    this.$("obj-title").textContent = "🎯 " + def.title + ptxt;
+    el.title = def.hint || "";
   },
 
   refreshAway() {
