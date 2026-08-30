@@ -355,10 +355,16 @@ const UI = {
       const stars = "★".repeat(lvl) + (lvl < 3 ? "☆" : "") + (lvl < 3 ? " " + Math.round(xpFrac * 100) + "%" : "");
       const tags = Person.statusText(p);
 
+      const relicHead = G.relics.find(r => r.bearerId === p.id);
+      const tagHtml = tags.map(x => (x.includes("haige") || x.includes("haavatud") || x.includes("näljas") || x === "riieteta") ? '<span class="warn">' + x + "</span>" : x).join(" · ") +
+        (relicHead ? (tags.length ? " · " : "") + '<span class="relic" title="' + relicHead.origin + '">' + relicHead.name + "</span>" : "");
+
       const head = document.createElement("div");
       head.className = "phead";
-      head.innerHTML = '<span class="pname">' + p.name + '</span><span class="page">' + p.age + "a " + (p.sex === "N" ? "♀" : "♂") + "</span>" +
+      head.innerHTML = '<span class="pname">' + p.name + '</span><span class="page">' + p.age + "a</span>" +
+        '<span class="psex" title="' + (p.sex === "N" ? "naine" : "mees") + '">' + (p.sex === "N" ? "♀" : "♂") + "</span>" +
         '<span class="hbar" title="Tervis ' + Math.round(p.health) + '"><span class="hfill" style="width:' + Math.max(0, p.health) + '%;background:' + (p.health > 60 ? "var(--ok)" : p.health > 30 ? "#c9a83c" : "var(--danger)") + '"></span></span>' +
+        '<span class="ptags">' + tagHtml + "</span>" +
         '<span class="pstat">' + (p.child ? "🧒" : "") + "</span>";
       row.appendChild(head);
 
@@ -411,27 +417,21 @@ const UI = {
         ctrl.appendChild(skill);
 
         if (["korilane", "kalur", "kytt"].includes(p.job)) {
-          const lbl = document.createElement("label");
-          lbl.className = "far";
-          lbl.title = "Tööta üks ring kaugemal: vähem saaki, rohkem kogemust ja rohkem ohtu. Mugav elu ei õpeta.";
-          const cb = document.createElement("input");
-          cb.type = "checkbox"; cb.checked = p.farWork;
-          cb.addEventListener("change", () => { p.farWork = cb.checked; });
-          lbl.appendChild(cb);
-          lbl.appendChild(document.createTextNode(" kaugemale"));
-          ctrl.appendChild(lbl);
+          // Ringi-nupp: näitab, kus see inimene täna töötab. Vajutus saadab ta
+          // ühe ringi kaugemale (vähem saaki, rohkem kogemust ja ohtu) ja tagasi.
+          const ring = Math.min(2, World.autoRing(Sim.curSite()) + (p.farWork ? 1 : 0));
+          const btn = document.createElement("button");
+          btn.className = "ringbtn" + (p.farWork ? " far" : "");
+          btn.textContent = "R" + (ring + 1);
+          btn.title = p.farWork
+            ? "Otsib kaugemalt (ring " + (ring + 1) + "): vähem saaki, rohkem kogemust ja ohtu. Vajuta, et tuua lähemale."
+            : "Töötab lähimas ringis, kus veel midagi kasvab. Vajuta, et saata kaugemale otsima.";
+          btn.addEventListener("click", () => { p.farWork = !p.farWork; this.refreshPeople(true); });
+          ctrl.appendChild(btn);
         }
         row.appendChild(ctrl);
       }
 
-      const relic = G.relics.find(r => r.bearerId === p.id);
-      if (tags.length || relic) {
-        const t = document.createElement("div");
-        t.className = "tags";
-        t.innerHTML = tags.map(x => (x.includes("haige") || x.includes("haavatud") || x.includes("näljas") || x === "riieteta") ? '<span class="warn">' + x + "</span>" : x).join(" · ") +
-          (relic ? (tags.length ? " · " : "") + '<span class="relic" title="' + relic.origin + '">' + relic.name + "</span>" : "");
-        row.appendChild(t);
-      }
       page.appendChild(row);
     }
   },

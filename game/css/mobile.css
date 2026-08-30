@@ -43,11 +43,12 @@
   #tb-res .dim { font-size: 10px; }
 
   /* rida 3: mõõdikud lühendatult + rahvas/skoor */
-  #tb-meters { order: 4; flex: 1 1 auto; gap: var(--sp-3) var(--sp-4); flex-wrap: wrap; }
-  .meter { gap: 3px; }
-  .meter label { width: auto; font-size: 9px; letter-spacing: .06em; }
-  .meter .bar { width: 34px; height: 7px; }
-  .meter .mval { font-size: 9px; width: 18px; }
+  #tb-meters { order: 4; flex: 1 1 100%; gap: var(--sp-3); flex-wrap: nowrap;
+    justify-content: space-between; }
+  .meter { gap: 2px; flex: 1 1 0; min-width: 0; }
+  .meter label { width: auto; font-size: 8px; letter-spacing: 0; white-space: nowrap; }
+  .meter .bar { width: 100%; min-width: 18px; height: 6px; }
+  .meter .mval { font-size: 8.5px; width: 15px; text-align: right; }
 
   #tb-pop { order: 5; margin-left: auto; gap: var(--sp-3); font-size: 12px; align-items: center; }
   #tb-pop b { font-size: 12px; }
@@ -116,11 +117,7 @@
     box-shadow: 0 -6px 18px rgba(0,0,0,.4);
   }
 
-  #sheet-handle {
-    display: flex; align-items: center; justify-content: center; gap: var(--sp-3);
-    padding: var(--sp-2) 0 var(--sp-1);
-    min-height: 26px; cursor: pointer;
-  }
+  #sheet-handle { display: none; }
   .sh-grip { display: block; width: 40px; height: 4px; border-radius: 2px; background: var(--border); }
   .sh-label { font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
   .sh-label { font-size: 8.5px; }
@@ -131,23 +128,19 @@
   /* puutealad: 44px miinimum */
   /* inimese kaart: kaks rida, ~poole madalam kui enne */
   .prow { padding: var(--sp-2) var(--sp-3); margin-bottom: var(--sp-2); }
-  .prow .phead { gap: var(--sp-2); }
+  .prow .phead { gap: 5px; align-items: center; }
   .prow .pname { font-size: 13.5px; }
   .prow .page { font-size: 10px; }
-  .prow .hbar { width: 42px; height: 5px; }
+  .prow .psex { font-size: 16px; }
+  .prow .hbar { width: 38px; height: 5px; flex: none; }
+  .prow .ptags { font-size: 10px; margin-left: 2px; }
   .prow .pctrl { gap: var(--sp-2); margin-top: var(--sp-2); flex-wrap: nowrap; align-items: center; }
   .prow select {
     min-height: 38px; font-size: 12.5px; padding: 0 var(--sp-2);
     max-width: none; flex: 1 1 0; min-width: 0; border-radius: 3px;
   }
   .prow .skill { font-size: 10px; flex: none; }
-  .prow label.far {
-    display: inline-flex; align-items: center; gap: 5px;
-    min-height: 38px; font-size: 0; flex: none; padding-right: 2px;
-  }
-  .prow label.far input { width: 20px; height: 20px; margin: 0; }
-  .prow label.far::after { content: "⇥"; font-size: 13px; color: var(--dim); }
-  .prow .tags { font-size: 10px; margin-top: 2px; line-height: 1.3; }
+  .prow .ringbtn { min-height: 38px; min-width: 44px; font-size: 12px; flex: none; }
 
   .bldrow, .act, .sitecard { padding: var(--sp-4); margin-bottom: var(--sp-3); }
   .bldrow button, .act button, .sitecard button, #btn-ration, #btn-clothes {

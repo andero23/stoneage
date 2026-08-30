@@ -344,13 +344,15 @@ const Sprites = {
 };
 
 // ametivärvid (keha)
+// Ametivärvid: küllastunud ja heledad, et eristuda rohelisest maast ja
+// pruunist laagriplatsist. Rohelist riietust ei kasuta ükski amet.
 const JOB_COLORS = {
-  korilane: "7a9448",
-  kalur: "4a7a9c",
-  kytt: "9c6a3a",
-  sodalane: "a54a3a",
-  meister: "8a7a5a",
-  skaut: "5a8a72",
-  samaan: "8a5aa5",
-  laps: "9c7448",
+  korilane: "e0b84a",   // kollane
+  kalur:    "4fa8d8",   // hele sinine
+  kytt:     "d97b32",   // oranž
+  sodalane: "d1443a",   // punane
+  meister:  "b9a893",   // hele hall
+  skaut:    "3fc9b0",   // türkiis
+  samaan:   "b06fdb",   // lilla
+  laps:     "f0d9b0",   // kreem
 };

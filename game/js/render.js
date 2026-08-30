@@ -8,11 +8,11 @@ const Render = {
   snow: [],
 
   SLOTS: {
-    fire: { x: 470, y: 300 },
-    onn: [[350, 215], [565, 210], [345, 390], [580, 390], [295, 300], [645, 300]],
-    raam: [[425, 175], [520, 175], [425, 435], [520, 435], [375, 150], [570, 150], [375, 465], [570, 465]],
-    pyha: [480, 92],
-    tookoht: [625, 345],
+    fire: { x: 466, y: 258 },
+    onn: [[356, 186], [548, 182], [352, 328], [560, 328], [312, 258], [618, 258]],
+    raam: [[430, 152], [508, 152], [430, 362], [508, 362], [389, 133], [548, 133], [389, 386], [548, 386]],
+    pyha: [480, 80],
+    tookoht: [600, 296],
     cave: [95, 95],
   },
 
@@ -50,12 +50,12 @@ const Render = {
     // laagriplats: tallatud maa
     ctx.fillStyle = season === 3 ? "#b3aa9a" : "#7d6a4e";
     ctx.beginPath();
-    ctx.ellipse(490, 310, 195, 150, 0, 0, Math.PI * 2);
+    ctx.ellipse(486, 268, 168, 122, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = season === 3 ? "#c1b8a8" : "#8a765a";
     for (let i = 0; i < 260; i++) {
       const a = rng() * Math.PI * 2, r = Math.sqrt(rng());
-      ctx.fillRect(Math.floor((490 + Math.cos(a) * 190 * r) / 4) * 4, Math.floor((310 + Math.sin(a) * 145 * r) / 4) * 4, 4, 4);
+      ctx.fillRect(Math.floor((486 + Math.cos(a) * 163 * r) / 4) * 4, Math.floor((268 + Math.sin(a) * 118 * r) / 4) * 4, 4, 4);
     }
 
     // jõgi paremal
@@ -81,8 +81,8 @@ const Render = {
       do {
         x = rng() * 920 + 10; y = rng() * 555 + 5;
         tries++;
-      } while (tries < 20 && (Math.hypot(x - 490, y - 320) < 230 || (site.river && x > 820)));
-      if (Math.hypot(x - 490, y - 320) < 225) continue;
+      } while (tries < 20 && (Math.hypot(x - 486, y - 278) < 200 || (site.river && x > 820)));
+      if (Math.hypot(x - 486, y - 278) < 196) continue;
       treeSpots.push({ x, y, kind: rng() < 0.45 ? "kuusk" : "leht" });
     }
     treeSpots.sort((a, b) => a.y - b.y);
@@ -93,7 +93,7 @@ const Render = {
     // kivid
     for (let i = 0; i < 6; i++) {
       const x = rng() * 800 + 60, y = rng() * 500 + 40;
-      if (Math.hypot(x - 490, y - 320) < 160) continue;
+      if (Math.hypot(x - 486, y - 278) < 140) continue;
       const spr = Sprites.rock();
       ctx.drawImage(spr, Math.floor(x), Math.floor(y), spr.width * 3, spr.height * 3);
     }
@@ -109,8 +109,8 @@ const Render = {
   // inimese sihtpunkt ameti järgi
   anchor(p) {
     const site = Sim.curSite();
-    if (p.sick || p.wound > 0) return { x: 470 + U.rf(-40, 60), y: 330 + U.rf(-20, 40) };
-    if (p.child) return { x: 480 + U.rf(-50, 50), y: 315 + U.rf(-35, 45) };
+    if (p.sick || p.wound > 0) return { x: 466 + U.rf(-38, 52), y: 288 + U.rf(-18, 34) };
+    if (p.child) return { x: 476 + U.rf(-44, 44), y: 274 + U.rf(-30, 38) };
     switch (p.job) {
       case "korilane":
         if (p.mode === "seened") return { x: U.rf(150, 350), y: U.rf(90, 190) };
@@ -122,19 +122,19 @@ const Render = {
       case "kytt": return { x: U.rf(120, 820), y: U.rf(70, 530) };
       case "sodalane": {
         const a = U.r() * Math.PI * 2;
-        return { x: 480 + Math.cos(a) * 150, y: 310 + Math.sin(a) * 120 };
+        return { x: 486 + Math.cos(a) * 132, y: 268 + Math.sin(a) * 104 };
       }
       case "meister": {
         if (site.b.tookoht) { const s = this.SLOTS.tookoht; return { x: s[0] + U.rf(-15, 45), y: s[1] + U.rf(-10, 30) }; }
-        return { x: 520 + U.rf(-30, 50), y: 340 + U.rf(-20, 30) };
+        return { x: 510 + U.rf(-28, 44), y: 300 + U.rf(-18, 26) };
       }
       case "skaut": return { x: U.rf(680, 800), y: U.rf(60, 130) };
       case "samaan": {
         if (site.b.pyha) return { x: this.SLOTS.pyha[0] + U.rf(-15, 40), y: this.SLOTS.pyha[1] + U.rf(15, 45) };
-        return { x: 450 + U.rf(-30, 40), y: 280 + U.rf(-20, 30) };
+        return { x: 448 + U.rf(-28, 36), y: 244 + U.rf(-18, 26) };
       }
     }
-    return { x: 480, y: 320 };
+    return { x: 486, y: 276 };
   },
 
   updatePeople(dt) {
@@ -178,7 +178,7 @@ const Render = {
     if (site.b.tara) {
       const post = Sprites.fencePost();
       for (let a = 0; a < Math.PI * 2; a += Math.PI / 26) {
-        const x = 480 + Math.cos(a) * 218, y = 312 + Math.sin(a) * 172;
+        const x = 486 + Math.cos(a) * 188, y = 270 + Math.sin(a) * 140;
         ctx.drawImage(post, Math.floor(x), Math.floor(y), post.width * 3, post.height * 3);
       }
     }
@@ -205,12 +205,12 @@ const Render = {
     // kalmed
     for (let i = 0; i < Math.min(site.graves, 8); i++) {
       const spr = Sprites.grave();
-      ctx.drawImage(spr, 545 + (i % 4) * 18, 88 + Math.floor(i / 4) * 16, spr.width * 2, spr.height * 2);
+      ctx.drawImage(spr, 552 + (i % 4) * 18, 78 + Math.floor(i / 4) * 16, spr.width * 2, spr.height * 2);
     }
 
     // lõke: kuma + leek
     const fx = this.SLOTS.fire.x, fy = this.SLOTS.fire.y;
-    const glow = ctx.createRadialGradient(fx + 20, fy + 15, 4, fx + 20, fy + 15, 55);
+    const glow = ctx.createRadialGradient(fx + 20, fy + 15, 4, fx + 20, fy + 15, 48);
     glow.addColorStop(0, "rgba(242,160,60,0.28)");
     glow.addColorStop(1, "rgba(242,160,60,0)");
     ctx.fillStyle = glow;

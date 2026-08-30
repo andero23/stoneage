@@ -101,9 +101,15 @@ b { color: #fff; }
 .prow .skill { color: var(--accent); font-size: 11px; letter-spacing: 1px; }
 .prow .hbar { width: 52px; height: 6px; background: #0b0805; border: 1px solid var(--border); display: inline-block; }
 .prow .hfill { height: 100%; background: var(--ok); display: block; }
-.prow .tags { font-size: 11px; color: var(--dim); margin-top: 2px; }
-.prow .tags .warn { color: var(--danger); }
-.prow .tags .relic { color: var(--faith); }
+.prow .psex { font-size: 15px; color: var(--dim); line-height: 1; }
+.prow .ptags { font-size: 11px; color: var(--dim); margin-left: 6px; flex: 1 1 auto; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.prow .ptags .warn { color: var(--danger); }
+.prow .ptags .relic { color: var(--faith); }
+.prow .ringbtn { padding: 2px 8px; font-size: 11px; min-width: 34px;
+  background: var(--panel); border: 1px solid var(--border); color: var(--dim); }
+.prow .ringbtn.far { border-color: var(--accent); color: var(--accent); background: var(--panel2); }
+.prow .ringbtn.far::after { content: " ⇥"; }
 .prow label.far { font-size: 11px; color: var(--dim); cursor: pointer; white-space: nowrap; }
 .prow label.far input { vertical-align: middle; }
 

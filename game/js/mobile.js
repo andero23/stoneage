@@ -24,9 +24,6 @@ const Mobile = {
     if (!m) {
       document.getElementById("main").classList.remove("camp-min");
       document.getElementById("topbar").classList.remove("tb-open");
-    } else {
-      const lab = document.querySelector("#sheet-handle .sh-label");
-      if (lab) lab.textContent = "peida laager";
     }
     this.syncTabs();
   },
@@ -44,8 +41,7 @@ const Mobile = {
   // ---------- ühendused ----------
   wire() {
     // käepide: klõps tsükleerib, lohistamine liigutab
-    const handle = document.getElementById("sheet-handle");
-    if (handle) handle.addEventListener("click", () => { if (this.on) this.toggleCamp(); });
+
 
     // tegevusriba: vahekaardid + kiirus
     document.querySelectorAll("#mob-tabs [data-mtab]").forEach(b => {
