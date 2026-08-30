@@ -17,6 +17,10 @@ const MIME = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; cha
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
 
+function subscribersFile() {
+  return path.join(DATA_DIR, "subscribers.jsonl");
+}
+
 function telemetryFile() {
   const d = new Date();
   const stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0");
@@ -112,6 +116,16 @@ function report() {
   for (const [k, n] of Object.entries(quitAt).sort((x, y) => y[1] - x[1]).slice(0, 10))
     out.push("  " + n + "× " + k);
 
+  // e-posti tellijad
+  try {
+    const subs = fs.readFileSync(path.join(DATA_DIR, "subscribers.jsonl"), "utf8")
+      .split("\n").filter(Boolean).map(l => { try { return JSON.parse(l); } catch (e) { return null; } })
+      .filter(Boolean);
+    const uniq = [...new Map(subs.map(s2 => [s2.email, s2])).values()];
+    out.push("\n--- E-posti tellijad (" + uniq.length + ") ---");
+    for (const u of uniq) out.push("  " + u.email + "  " + new Date(u.ts).toISOString().slice(0, 16).replace("T", " "));
+  } catch (e) { out.push("\n--- E-posti tellijad: 0 ---"); }
+
   // abi ja tagasiside
   out.push("\nAbi avamisi: " + by("help").length);
   const fbs = by("feedback");
@@ -140,6 +154,36 @@ http.createServer((req, res) => {
           fs.appendFile(telemetryFile(), lines, () => {});
         }
       } catch (e) {}
+      res.writeHead(204).end();
+    });
+    return;
+  }
+
+  // e-posti tellimus avalehelt
+  if (req.method === "POST" && req.url === "/api/subscribe") {
+    let body = "";
+    req.on("data", c => { body += c; if (body.length > 4000) req.destroy(); });
+    req.on("end", () => {
+      let email = "";
+      try { email = String(JSON.parse(body).email || "").trim().toLowerCase(); } catch (e) {}
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || email.length > 200) {
+        res.writeHead(400).end("bad email");
+        return;
+      }
+      const rec = { email, ts: Date.now(), ua: (req.headers["user-agent"] || "").slice(0, 120) };
+      fs.appendFile(subscribersFile(), JSON.stringify(rec) + "\n", () => {});
+      // valikuline teavitus: seadista NOTIFY_WEBHOOK (Discord, Zapier, e-posti teenus vms)
+      if (process.env.NOTIFY_WEBHOOK) {
+        try {
+          const u = new URL(process.env.NOTIFY_WEBHOOK);
+          const lib = u.protocol === "http:" ? require("http") : require("https");
+          const payload = JSON.stringify({ content: "The Winter Count — uus tellija: " + email });
+          const rq = lib.request(u, { method: "POST", headers: {
+            "Content-Type": "application/json", "Content-Length": Buffer.byteLength(payload) } });
+          rq.on("error", () => {});
+          rq.end(payload);
+        } catch (e) {}
+      }
       res.writeHead(204).end();
     });
     return;
