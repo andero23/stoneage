@@ -164,7 +164,7 @@ const UI = {
       this.clearModals();
       this.refreshAll(true);
       T.newGame(G.seed, true);
-      Sim.log("Tuli põleb edasi. Mäng jätkub sealt, kus pooleli jäi.", "evt");
+      Sim.log("The fire still burns. The game picks up where you left it.", "evt");
       return true;
     } catch (e) { console.error(e); return false; }
   },
@@ -175,26 +175,26 @@ const UI = {
     const site = Sim.curSite();
     const auto = World.autoRing(site);
     const pct = r => Math.round((site.max[r] > 0 ? site.points[r] / site.max[r] : 0) * 100);
-    const names = ["Ring 1 — küla ümber", "Ring 2 — päeva tee kaugusel", "Ring 3 — kaugmets"];
+    const names = ["Ring 1 — around the camp", "Ring 2 — a day's walk out", "Ring 3 — the far forest"];
     const desc = [
-      "Ohutu. Käik võtab ühe päeva ja rünnaku ajal on rahvas kodus. Ammendub esimesena.",
-      "Saak " + Math.round(DATA.RING_MOD[1] * 100) + "% ja kogemust " + DATA.RING_XP[1] + "× kiiremini. " +
-        "Käik võtab kaks päeva — rünnaku ajal ei jõua need inimesed koju. Hundid ja metssead.",
-      "Saak " + Math.round(DATA.RING_MOD[2] * 100) + "%, aga kogemust " + DATA.RING_XP[2] + "× kiiremini. " +
-        "Karu, hundikari, võõrad ja eksimine. Siin võib inimene ka päriselt kaduma jääda.",
+      "Safe. The walk takes one day, and in a raid your people are home. Empties first.",
+      "Yield " + Math.round(DATA.RING_MOD[1] * 100) + "% and experience " + DATA.RING_XP[1] + "× faster. " +
+        "The walk takes two days — in a raid these people cannot get home. Wolves and boar.",
+      "Yield " + Math.round(DATA.RING_MOD[2] * 100) + "%, but experience " + DATA.RING_XP[2] + "× faster. " +
+        "Bear, wolf pack, strangers, and getting lost. Here a person can vanish for good.",
     ];
-    let body = "Ümbrus ammendub seestpoolt välja. Iga ring on eraldi varu: kui lähim tühjeneb, " +
-      "käiakse kaugemal — aeglasemalt, ohtlikumalt, aga seal õpitakse rohkem.\n\n";
+    let body = "The land empties from the inside out. Each ring is a separate store: when the nearest runs dry, " +
+      "people walk further — slower, riskier, but they learn more out there.\n\n";
     for (let r = 0; r < 3; r++) {
-      body += names[r] + " — alles " + pct(r) + "%" + (r === auto ? "  ← siin käiakse täna" : "") + "\n" +
+      body += names[r] + " — " + pct(r) + "% left" + (r === auto ? "  ← today's ring" : "") + "\n" +
         desc[r] + "\n\n";
     }
-    body += "Mugav elu ei õpeta: rühm, kes istub rikkas kohas ringis 1, kasvab suureks ja jääb rumalaks. " +
-      "Üksiku inimese saab saata kaugemale Rahva-vahekaardi ringi-nupuga.";
+    body += "Comfort teaches nothing: a band that sits in a rich place working ring 1 grows large and stays ignorant. " +
+      "You can send one person further out with the ring button on the People tab.";
     this.queueModal({
-      title: "Ringid ümber laagri",
+      title: "The rings around camp",
       body,
-      choices: [{ label: "Selge", fx: () => {} }],
+      choices: [{ label: "Understood", fx: () => {} }],
       def: 0,
     });
   },
@@ -272,8 +272,8 @@ const UI = {
   },
 
   refreshTop() {
-    this.$("date-txt").textContent = Sim.seasonName().toUpperCase() + ", " + G.year + ". aasta";
-    this.$("day-txt").textContent = "päev " + G.sday + "/30" + (G.journey ? " — TEEL" : "");
+    this.$("date-txt").textContent = Sim.seasonName().toUpperCase() + ", YEAR " + G.year;
+    this.$("day-txt").textContent = "day " + G.sday + "/30" + (G.journey ? " — TRAVELLING" : "");
     this.$("r-fresh").textContent = Math.floor(Sim.freshTotal());
     this.$("r-dried").textContent = Math.floor(G.dried);
     this.$("r-mat").textContent = Math.floor(G.mat);
@@ -282,8 +282,8 @@ const UI = {
     this.$("r-tool").textContent = Math.round(G.tool);
     const gw = Sim.gearCount("relv"), ga = Sim.gearCount("turvis");
     this.$("r-gear").textContent = gw + "/" + ga;
-    this.$("res-gear").title = "Sõjavarustus: " + gw + " relva, " + ga + " turvist (kuluvad lahingus). Leiud ootel: " +
-      G.finds.flint + " erilist kivi, " + G.finds.bone + " suurt luud. Sepistamine: Küla-vahekaart.";
+    this.$("res-gear").title = "War gear: " + gw + " weapons, " + ga + " armour (they wear out in battle). Finds waiting: " +
+      G.finds.flint + " special stones, " + G.finds.bone + " great bones. Forging: Camp tab.";
     this.$("r-pop").textContent = Sim.pop();
     this.$("r-leave").textContent = Sim.leaveCost();
     this.$("r-score").textContent = Math.round(G.score);
@@ -295,7 +295,7 @@ const UI = {
 
     const req = Sim.secReq();
     const secEl = this.$("m-sec");
-    secEl.title = "Turvatunne " + Math.round(G.sec) + " / vajadus " + req + ". Nõue kasvab rahvaarvuga (3 × inimest). Kui jääb alla, töö aeglustub ja inimesed hakkavad lahkuma.";
+    secEl.title = "Safety " + Math.round(G.sec) + " / needed " + req + ". The need grows with the band (3 per person). Below it, work slows and people start to leave.";
     secEl.querySelector(".fill").style.width = G.sec + "%";
     secEl.querySelector(".req").style.left = Math.min(100, req) + "%";
     secEl.querySelector(".mval").textContent = Math.round(G.sec);
@@ -308,9 +308,9 @@ const UI = {
 
     const vis = Sim.visibility();
     const visEl = this.$("m-vis");
-    visEl.title = "Nähtavus " + vis + ": mida teised sinust näevad. Kasvatavad rahvaarv, varad, ehitised ja peod; " +
-      "koha varjatus (" + DATA.LEVEL_NAME(Sim.curSite().hidden || 0) + ") varjab. " +
-      (vis < DATA.VIS.RAID_BASE ? "Praegu ei leia teid keegi." : "Teid võidakse märgata ja rünnata.");
+    visEl.title = "Exposure " + vis + ": what others see of you. People, stores, buildings and feasts raise it; " +
+      "the cover of the place (" + DATA.LEVEL_NAME(Sim.curSite().hidden || 0) + ") hides you. " +
+      (vis < DATA.VIS.RAID_BASE ? "Right now nobody can find you." : "You may be spotted and attacked.");
     visEl.querySelector(".fill").style.width = vis + "%";
     visEl.querySelector(".fill").style.background = vis < DATA.VIS.RAID_BASE ? "var(--ok)" : vis < 55 ? "#c9a83c" : "var(--danger)";
     visEl.querySelector(".mval").textContent = vis;
@@ -477,7 +477,7 @@ const UI = {
 
     html += '<div class="sechead">' + site.name + " — " + DATA.RICHNESS_NAME(site.rich) + " paik</div>";
     html += '<div class="bdesc" style="font-size:12px;color:var(--dim);line-height:1.4;margin-bottom:6px">' +
-      (site.river ? "Jõgi annab kala. " : "Kalapüük kehv, aga METSAD ON JAHIRIKKAD ja kevadel toidavad linnupesad. ") +
+      (site.river ? "Jõgi annab kala. " : "Vett on vähe: kalapüük kehv. ") +
       (site.cave ? "Koobas: peavarju 12 inimesele tasuta. " : "") +
       (site.fishRun ? "KALAJOOKSU KOHT: kevadel erakordne püük. " : "") +
       "Varjatus: " + DATA.LEVEL_NAME(site.hidden || 0) + " · kaitstavus: " + DATA.LEVEL_NAME(site.defensible || 0) + ". " +

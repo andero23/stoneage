@@ -1,47 +1,47 @@
 <!DOCTYPE html>
-<html lang="et">
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Kiviaeg — jääda või liikuda</title>
+<title>The Winter Count — Stay or Roam</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="stylesheet" href="css/style.css?v=31">
-<link rel="stylesheet" href="css/mobile.css?v=31">
+<link rel="stylesheet" href="css/style.css?v=32">
+<link rel="stylesheet" href="css/mobile.css?v=32">
 </head>
 <body>
 <div id="app">
   <!-- Top bar -->
   <div id="topbar">
     <div class="tb-group" id="tb-date">
-      <span id="date-txt">1. suvi, 1. aasta</span>
-      <span id="day-txt" class="dim">päev 1/30</span>
+      <span id="date-txt">summer 1, year 1</span>
+      <span id="day-txt" class="dim">day 1/30</span>
     </div>
     <div class="tb-group" id="tb-speed">
-      <button class="spd" data-spd="0" title="Paus (tühik)">❚❚</button>
-      <button class="spd" data-spd="1" title="Tavaline kiirus">▶</button>
-      <button class="spd" data-spd="2" title="Kahekordne">▶▶</button>
-      <button class="spd" data-spd="4" title="Neljakordne">▶▶▶</button>
+      <button class="spd" data-spd="0" title="Pause (space)">❚❚</button>
+      <button class="spd" data-spd="1" title="Normal speed">▶</button>
+      <button class="spd" data-spd="2" title="Double speed">▶▶</button>
+      <button class="spd" data-spd="4" title="Quadruple speed">▶▶▶</button>
     </div>
     <div class="tb-group" id="tb-res">
-      <span class="res" id="res-toit" title="Värske toit rikneb ~6 päevaga. Kuivatatud säilib talve.">🍖 <b id="r-fresh">0</b> <span class="dim">+</span> <b id="r-dried">0</b><span class="dim">kuiv</span></span>
-      <span class="res" id="res-mat" title="Materjal: puit, kivi, luu. Vajalik ehitisteks ja tööriistadeks.">🪵 <b id="r-mat">0</b></span>
-      <span class="res" id="res-hides" title="Nahad tulevad ainult jahilt. Vajalikud talveriieteks.">🦌 <b id="r-hides">0</b></span>
-      <span class="res" id="res-clothes" title="Talveriided: mitu inimest on riietatud / kokku">🧥 <b id="r-clothes">0/0</b></span>
-      <span class="res" id="res-tool" title="Tööriistade kvaliteet. Meister hoiab korras, töökoht tõstab lage.">⚒ <b id="r-tool">0</b></span>
+      <span class="res" id="res-toit" title="Fresh food rots in about 6 days. Dried food keeps through winter.">🍖 <b id="r-fresh">0</b> <span class="dim">+</span> <b id="r-dried">0</b><span class="dim">dry</span></span>
+      <span class="res" id="res-mat" title="Timber, stone and bone. Needed for building and tools.">🪵 <b id="r-mat">0</b></span>
+      <span class="res" id="res-hides" title="Hides come only from hunting. Needed for winter clothes.">🦌 <b id="r-hides">0</b></span>
+      <span class="res" id="res-clothes" title="Winter clothes: how many are clothed / total">🧥 <b id="r-clothes">0/0</b></span>
+      <span class="res" id="res-tool" title="Tool quality. A crafter keeps them sharp, a workshop raises the ceiling.">⚒ <b id="r-tool">0</b></span>
       <span class="res" id="res-gear" title="">⚔ <b id="r-gear">0</b></span>
     </div>
     <div class="tb-group" id="tb-meters">
-      <div class="meter" id="m-sec" title=""><label>Turvatunne</label><div class="bar"><div class="fill sec"></div><div class="req"></div></div><span class="mval"></span></div>
-      <div class="meter" id="m-faith" title="Usk on puhver raskuste vastu: kõrge usuga talutakse nälga ja surma ilma lahkumata."><label>Usk</label><div class="bar"><div class="fill faith"></div></div><span class="mval"></span></div>
-      <div class="meter" id="m-rep" title="Maine määrab, kes tuleb: liitujad, kauplejad… või röövlid."><label>Maine</label><div class="bar"><div class="fill rep"></div></div><span class="mval"></span></div>
-      <div class="meter" id="m-vis" title=""><label>Nähtavus</label><div class="bar"><div class="fill vis"></div></div><span class="mval"></span></div>
+      <div class="meter" id="m-sec" title=""><label>Safety</label><div class="bar"><div class="fill sec"></div><div class="req"></div></div><span class="mval"></span></div>
+      <div class="meter" id="m-faith" title="Faith is a buffer against hardship: with high faith people endure hunger and death without leaving."><label>Faith</label><div class="bar"><div class="fill faith"></div></div><span class="mval"></span></div>
+      <div class="meter" id="m-rep" title="Renown decides who comes: joiners, traders… or raiders."><label>Renown</label><div class="bar"><div class="fill rep"></div></div><span class="mval"></span></div>
+      <div class="meter" id="m-vis" title=""><label>Exposure</label><div class="bar"><div class="fill vis"></div></div><span class="mval"></span></div>
     </div>
     <div class="tb-group" id="tb-pop">
-      <span id="pop-txt" title="Rahvaarv">👥 <b id="r-pop">0</b></span>
-      <span id="leave-txt" title="Lahkumise hind: mis jääb maha, kui kolite. Iga ehitis tõstab seda.">⚓ <b id="r-leave">0</b></span>
-      <span id="score-txt" title="Skoor koguneb iga elatud hooajaga: rahvaarv, varad, reliikviad, üle elatud talved, võidetud sõjaretked. Surm lõpetab kogumise.">🏆 <b id="r-score">0</b></span>
-      <button id="btn-feedback" title="Saada tagasisidet">💬</button>
-      <button id="tb-more" title="Rohkem näitajaid" aria-expanded="false">⌄</button>
+      <span id="pop-txt" title="Population">👥 <b id="r-pop">0</b></span>
+      <span id="leave-txt" title="The cost of leaving: what you abandon if you move. Every building raises it.">⚓ <b id="r-leave">0</b></span>
+      <span id="score-txt" title="Score builds every season you survive: people, stores, relics, winters passed, raids won. Death ends the count.">🏆 <b id="r-score">0</b></span>
+      <button id="btn-feedback" title="Send feedback">💬</button>
+      <button id="tb-more" title="More readings" aria-expanded="false">⌄</button>
     </div>
   </div>
 
@@ -50,23 +50,23 @@
     <div id="canvas-wrap">
       <canvas id="game-canvas" width="960" height="600"></canvas>
       <div id="log-overlay"></div>
-      <div id="ring-overlay" title="Ümbruse rikkus ringide kaupa. Kui ring tühjeneb, käivad töölised kaugemal: aeglasem ja ohtlikum.">
+      <div id="ring-overlay" title="How rich the land is, ring by ring. When a ring empties, workers walk further: slower and more dangerous.">
         <div class="ringbar" id="rb-0"><label>Ring 1</label><div class="rbar"><div class="rfill"></div></div></div>
         <div class="ringbar" id="rb-1"><label>Ring 2</label><div class="rbar"><div class="rfill"></div></div></div>
         <div class="ringbar" id="rb-2"><label>Ring 3</label><div class="rbar"><div class="rfill"></div></div></div>
       </div>
       <div id="away-overlay"></div>
-      <div id="obj-bar" class="hidden"><span id="obj-title"></span><span id="obj-hide" title="Peida eesmärgid">✕</span></div>
+      <div id="obj-bar" class="hidden"><span id="obj-title"></span><span id="obj-hide" title="Hide goals">✕</span></div>
     </div>
 
     <!-- Side panel -->
     <div id="side">
-      <div id="sheet-handle" aria-hidden="true"><span class="sh-grip"></span><span class="sh-label">tõmba üles</span></div>
+      <div id="sheet-handle" aria-hidden="true"><span class="sh-grip"></span><span class="sh-label">drag up</span></div>
       <div id="tabs">
-        <button class="tab active" data-tab="rahvas">Rahvas</button>
-        <button class="tab" data-tab="kyla">Küla</button>
-        <button class="tab" data-tab="teod">Teod</button>
-        <button class="tab" data-tab="kaart">Kaart</button>
+        <button class="tab active" data-tab="rahvas">People</button>
+        <button class="tab" data-tab="kyla">Camp</button>
+        <button class="tab" data-tab="teod">Acts</button>
+        <button class="tab" data-tab="kaart">Map</button>
       </div>
       <div id="tab-rahvas" class="tabpage active"></div>
       <div id="tab-kyla" class="tabpage"></div>
@@ -78,17 +78,17 @@
 
 <!-- Mobiil: logi täisvaates -->
 <div id="log-full">
-  <div class="lf-head"><b>Sündmuste logi</b><button id="lf-close" aria-label="Sulge">✕</button></div>
+  <div class="lf-head"><b>Event log</b><button id="lf-close" aria-label="Close">✕</button></div>
   <div class="lf-body"></div>
 </div>
 
 <!-- Mobiil: tegevusriba -->
-<nav id="mob-tabs" aria-label="Vaated">
-  <button data-mtab="rahvas"><span class="mt-ico">◆</span><span class="mt-lab">Rahvas</span></button>
-  <button data-mtab="kyla"><span class="mt-ico">▣</span><span class="mt-lab">Küla</span></button>
-  <button data-mtab="teod"><span class="mt-ico">✦</span><span class="mt-lab">Teod</span></button>
-  <button data-mtab="kaart"><span class="mt-ico">◇</span><span class="mt-lab">Kaart</span></button>
-  <button id="mt-speed" title="Kiirus"><span class="mt-ico">⏸</span><span class="mt-lab">1×</span></button>
+<nav id="mob-tabs" aria-label="Views">
+  <button data-mtab="rahvas"><span class="mt-ico">◆</span><span class="mt-lab">People</span></button>
+  <button data-mtab="kyla"><span class="mt-ico">▣</span><span class="mt-lab">Camp</span></button>
+  <button data-mtab="teod"><span class="mt-ico">✦</span><span class="mt-lab">Acts</span></button>
+  <button data-mtab="kaart"><span class="mt-ico">◇</span><span class="mt-lab">Map</span></button>
+  <button id="mt-speed" title="Speed"><span class="mt-ico">⏸</span><span class="mt-lab">1×</span></button>
 </nav>
 
 <!-- Modal -->
@@ -103,34 +103,34 @@
 <!-- Combat overlay -->
 <div id="combat-back" class="hidden">
   <div id="combat-box">
-    <h2 id="combat-title">Kokkupõrge</h2>
+    <h2 id="combat-title">Encounter</h2>
     <canvas id="combat-canvas" width="780" height="480"></canvas>
     <div id="combat-info"></div>
     <div id="combat-buttons">
-      <button id="cb-endturn">Käik läbi</button>
-      <button id="cb-flee" title="Kõik põgenevad. Kaotad saaki ja mainet, aga mitte inimesi.">Põgene</button>
-      <button id="cb-auto" title="Lase lahingul ise laheneda.">Lahenda ise</button>
+      <button id="cb-endturn">End turn</button>
+      <button id="cb-flee" title="Everyone runs. You lose loot and renown, but not people.">Flee</button>
+      <button id="cb-auto" title="Let the fight resolve itself.">Auto-resolve</button>
     </div>
-    <button id="cb-confirm">⚔ Ründa</button>
+    <button id="cb-confirm">⚔ Attack</button>
     <div id="combat-log"></div>
   </div>
 </div>
 
-<script src="js/telemetry.js?v=31"></script>
-<script src="js/util.js?v=31"></script>
-<script src="js/data.js?v=31"></script>
-<script src="js/sprites.js?v=31"></script>
-<script src="js/world.js?v=31"></script>
-<script src="js/objectives.js?v=31"></script>
-<script src="js/person.js?v=31"></script>
-<script src="js/sim.js?v=31"></script>
-<script src="js/events.js?v=31"></script>
-<script src="js/combat.js?v=31"></script>
-<script src="js/render.js?v=31"></script>
-<script src="js/bot.js?v=31"></script>
-<script src="js/ui.js?v=31"></script>
-<script src="js/mobile.js?v=31"></script>
-<script src="js/admin.js?v=31"></script>
-<script src="js/main.js?v=31"></script>
+<script src="js/telemetry.js?v=32"></script>
+<script src="js/util.js?v=32"></script>
+<script src="js/data.js?v=32"></script>
+<script src="js/sprites.js?v=32"></script>
+<script src="js/world.js?v=32"></script>
+<script src="js/objectives.js?v=32"></script>
+<script src="js/person.js?v=32"></script>
+<script src="js/sim.js?v=32"></script>
+<script src="js/events.js?v=32"></script>
+<script src="js/combat.js?v=32"></script>
+<script src="js/render.js?v=32"></script>
+<script src="js/bot.js?v=32"></script>
+<script src="js/ui.js?v=32"></script>
+<script src="js/mobile.js?v=32"></script>
+<script src="js/admin.js?v=32"></script>
+<script src="js/main.js?v=32"></script>
 </body>
 </html>
