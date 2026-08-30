@@ -1,6 +1,19 @@
 // sprites.js — protseduuriline pixel-art. Vajab DOM-i (canvas); headless-režiimis ei laeta.
 "use strict";
 
+// Ametivärvid: küllastunud ja heledad, et eristuda rohelisest maast ja
+// pruunist laagriplatsist. Rohelist riietust ei kasuta ükski amet.
+const JOB_COLORS = {
+  korilane: "e0b84a",   // kollane
+  kalur:    "4fa8d8",   // hele sinine
+  kytt:     "d97b32",   // oranž
+  sodalane: "d1443a",   // punane
+  meister:  "2b2b33",   // must — beež kadus laagriplatsi taustal ära
+  skaut:    "3fc9b0",   // türkiis
+  samaan:   "9a4fd1",   // lilla
+  laps:     "e35d8a",   // roosa
+};
+
 const Sprites = {
   cache: {},
 
@@ -56,7 +69,8 @@ const Sprites = {
   child(frame = 0) {
     const key = "child" + frame;
     if (this.cache[key]) return this.cache[key];
-    const pal = { s: this.hex("d4a06c"), b: this.hex("9c7448"), h: this.hex("3a2a18") };
+    // laps kandis varem pruuni, mis kadus laagriplatsi taustal ära
+    const pal = { s: this.hex("d4a06c"), b: this.hex(JOB_COLORS.laps), h: this.hex("3a2a18") };
     const rows = frame === 0 ? [
       "..hhh...", "..sss...", "..bbb...", ".bbbbb..", "..bbb...", "..b.b...",
     ] : [
@@ -344,15 +358,3 @@ const Sprites = {
 };
 
 // ametivärvid (keha)
-// Ametivärvid: küllastunud ja heledad, et eristuda rohelisest maast ja
-// pruunist laagriplatsist. Rohelist riietust ei kasuta ükski amet.
-const JOB_COLORS = {
-  korilane: "e0b84a",   // kollane
-  kalur:    "4fa8d8",   // hele sinine
-  kytt:     "d97b32",   // oranž
-  sodalane: "d1443a",   // punane
-  meister:  "b9a893",   // hele hall
-  skaut:    "3fc9b0",   // türkiis
-  samaan:   "b06fdb",   // lilla
-  laps:     "f0d9b0",   // kreem
-};

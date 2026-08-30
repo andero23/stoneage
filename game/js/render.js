@@ -228,6 +228,11 @@ const Render = {
       else spr = Sprites.villager(JOB_COLORS[p.job] || "888888", "c9915e", moving ? walkFrame : 0);
       const scale = 2;
       const x = Math.floor(p.pos.x - spr.width), y = Math.floor(p.pos.y - spr.height * 2);
+      // vari jalge all: hoiab inimese taustast lahus ka heledal platsil ja lumel
+      ctx.fillStyle = "rgba(10,8,5,0.38)";
+      ctx.beginPath();
+      ctx.ellipse(x + spr.width, y + spr.height * scale, spr.width * 0.75, 2.5, 0, 0, Math.PI * 2);
+      ctx.fill();
       ctx.drawImage(spr, x, y, spr.width * scale, spr.height * scale);
       // tervis / staatus
       if (p.health < 70 || p.sick || p.wound > 0) {
