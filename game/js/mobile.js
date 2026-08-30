@@ -6,8 +6,6 @@
 const Mobile = {
   BREAK: 820,
   on: false,
-  sheet: "peek",          // peek | half | full
-  drag: null,
 
   isMobile() { return window.innerWidth <= this.BREAK; },
 
@@ -23,58 +21,37 @@ const Mobile = {
     if (m === this.on) return;
     this.on = m;
     document.body.classList.toggle("is-mobile", m);
-    if (m) this.setSheet("peek");
-    else {
-      document.getElementById("side").className = "";
+    if (!m) {
+      document.getElementById("main").classList.remove("camp-min");
       document.getElementById("topbar").classList.remove("tb-open");
+    } else {
+      const lab = document.querySelector("#sheet-handle .sh-label");
+      if (lab) lab.textContent = "peida laager";
     }
     this.syncTabs();
   },
 
-  // ---------- alumine leht ----------
-  setSheet(state) {
-    this.sheet = state;
-    const side = document.getElementById("side");
-    side.classList.remove("sheet-peek", "sheet-half", "sheet-full");
-    side.classList.add("sheet-" + state);
-  },
-
-  cycleSheet() {
-    this.setSheet(this.sheet === "peek" ? "half" : this.sheet === "half" ? "full" : "peek");
+  // ---------- laagri/paneeli jaotus ----------
+  // Laager on fikseeritud riba, paneel täidab ülejäänu. Käepide peidab laagri,
+  // kui on vaja pikka nimekirja korraga näha.
+  toggleCamp() {
+    const main = document.getElementById("main");
+    const hidden = main.classList.toggle("camp-min");
+    const lab = document.querySelector("#sheet-handle .sh-label");
+    if (lab) lab.textContent = hidden ? "näita laagrit" : "peida laager";
   },
 
   // ---------- ühendused ----------
   wire() {
     // käepide: klõps tsükleerib, lohistamine liigutab
     const handle = document.getElementById("sheet-handle");
-    if (handle) {
-      handle.addEventListener("click", () => { if (this.on) this.cycleSheet(); });
-      handle.addEventListener("touchstart", e => {
-        if (!this.on) return;
-        this.drag = { y: e.touches[0].clientY, from: this.sheet };
-      }, { passive: true });
-      handle.addEventListener("touchmove", e => {
-        if (!this.drag) return;
-        const dy = this.drag.y - e.touches[0].clientY;   // üles = positiivne
-        if (Math.abs(dy) < 40) return;
-        const order = ["peek", "half", "full"];
-        let i = order.indexOf(this.drag.from) + (dy > 0 ? 1 : -1);
-        i = Math.max(0, Math.min(2, i));
-        this.setSheet(order[i]);
-        this.drag = null;
-      }, { passive: true });
-      handle.addEventListener("touchend", () => { this.drag = null; }, { passive: true });
-    }
+    if (handle) handle.addEventListener("click", () => { if (this.on) this.toggleCamp(); });
 
     // tegevusriba: vahekaardid + kiirus
     document.querySelectorAll("#mob-tabs [data-mtab]").forEach(b => {
       b.addEventListener("click", () => {
         const name = b.dataset.mtab;
-        const already = document.querySelector(".tab.active")?.dataset.tab === name;
-        // sama vahekaart uuesti = sulge/ava
-        if (already && this.sheet !== "peek") { this.setSheet("peek"); this.syncTabs(); return; }
         document.querySelector('.tab[data-tab="' + name + '"]')?.click();
-        this.setSheet(this.sheet === "peek" ? "half" : this.sheet);
         this.syncTabs();
       });
     });
@@ -120,7 +97,7 @@ const Mobile = {
   syncTabs() {
     const active = document.querySelector(".tab.active")?.dataset.tab;
     document.querySelectorAll("#mob-tabs [data-mtab]").forEach(b =>
-      b.classList.toggle("active", b.dataset.mtab === active && this.sheet !== "peek"));
+      b.classList.toggle("active", b.dataset.mtab === active));
     this.syncSpeed();
   },
 

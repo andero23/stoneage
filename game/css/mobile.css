@@ -19,90 +19,78 @@
   html, body { overscroll-behavior: none; }
   #app { height: 100vh; height: 100dvh; }
 
-  /* ---------- ülariba: 15 näitajast 7 ---------- */
+  /* ---------- ülariba: kõik mahub, kolm tihedat rida ---------- */
   #topbar {
-    height: var(--mob-top);
-    min-height: var(--mob-top);
-    padding: var(--sp-3) var(--sp-4);
-    gap: var(--sp-3) var(--sp-5);
-    align-content: flex-start;
-    position: relative;
-    overflow: hidden;
-  }
-  #topbar.tb-open {
     height: auto;
-    max-height: 62vh;
-    overflow-y: auto;
-    padding-bottom: var(--sp-5);
+    min-height: 0;
+    padding: var(--sp-2) var(--sp-4) var(--sp-3);
+    gap: var(--sp-2) var(--sp-4);
+    align-content: flex-start;
+    font-size: 12px;
   }
 
-  #tb-date { min-width: 0; flex: 1 1 100%; flex-direction: row; align-items: baseline; gap: var(--sp-3); }
-  #date-txt { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
-  #day-txt { font-size: 11px; }
+  /* rida 1: kuupäev + kõik neli kiirusnuppu */
+  #tb-date { min-width: 0; flex: 1 1 auto; flex-direction: row; align-items: baseline; gap: var(--sp-3); }
+  #date-txt { font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; }
+  #day-txt { font-size: 10.5px; }
 
-  /* teisesed näitajad peidus, kuni ⌄ avab */
-  #res-hides, #res-clothes, #res-tool, #res-gear,
-  #m-faith, #m-rep, #m-vis, #leave-txt, #score-txt, #btn-feedback { display: none; }
-  #topbar.tb-open #res-hides, #topbar.tb-open #res-clothes,
-  #topbar.tb-open #res-tool, #topbar.tb-open #res-gear,
-  #topbar.tb-open #m-faith, #topbar.tb-open #m-rep, #topbar.tb-open #m-vis,
-  #topbar.tb-open #leave-txt, #topbar.tb-open #score-txt,
-  #topbar.tb-open #btn-feedback { display: flex; }
-  #topbar.tb-open #res-hides, #topbar.tb-open #res-clothes,
-  #topbar.tb-open #res-tool, #topbar.tb-open #res-gear,
-  #topbar.tb-open #leave-txt, #topbar.tb-open #score-txt { display: inline; }
+  #tb-speed { gap: 3px; order: 2; }
+  #tb-speed .spd { min-width: 34px; height: 28px; padding: 0 4px; font-size: 10px; line-height: 1; }
 
-  #tb-res { gap: var(--sp-4); font-size: 13px; flex-wrap: wrap; }
-  #tb-meters { gap: var(--sp-4); flex-wrap: wrap; }
-  .meter label { width: auto; font-size: 9px; letter-spacing: .1em; }
-  .meter .bar { width: 54px; }
+  /* rida 2: ressursid tihedalt */
+  #tb-res { order: 3; flex: 1 1 100%; gap: var(--sp-4); font-size: 12px; flex-wrap: wrap; }
+  #tb-res .res { white-space: nowrap; }
+  #tb-res .dim { font-size: 10px; }
 
-  /* kiirusnupud: ülaribal ainult paus+jooksuta, ülejäänu tegevusribalt */
-  #tb-speed { gap: var(--sp-2); }
-  #tb-speed .spd { min-width: 40px; height: 34px; font-size: 12px; }
-  #tb-speed .spd[data-spd="2"], #tb-speed .spd[data-spd="4"] { display: none; }
-  #topbar.tb-open #tb-speed .spd[data-spd="2"],
-  #topbar.tb-open #tb-speed .spd[data-spd="4"] { display: inline-block; }
+  /* rida 3: mõõdikud lühendatult + rahvas/skoor */
+  #tb-meters { order: 4; flex: 1 1 auto; gap: var(--sp-3) var(--sp-4); flex-wrap: wrap; }
+  .meter { gap: 3px; }
+  .meter label { width: auto; font-size: 9px; letter-spacing: .06em; }
+  .meter .bar { width: 34px; height: 7px; }
+  .meter .mval { font-size: 9px; width: 18px; }
 
-  #tb-pop { margin-left: auto; gap: var(--sp-4); font-size: 13px; align-items: center; }
+  #tb-pop { order: 5; margin-left: auto; gap: var(--sp-3); font-size: 12px; align-items: center; }
+  #tb-pop b { font-size: 12px; }
 
-  #tb-more {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 34px; height: 34px; padding: 0; font-size: 14px; line-height: 1;
-    background: var(--panel2); border: 1px solid var(--border); border-radius: 3px;
-  }
-  #topbar.tb-open #tb-more { transform: rotate(180deg); }
-
+  /* nool ja arendajapaneeli nupp ära — admin avaneb pika vajutusega kuupäeval */
+  #tb-more, #btn-feedback ~ #ad-gear, #ad-gear { display: none !important; }
+  #btn-feedback { padding: 1px 6px; font-size: 11px; }
   /* ---------- põhiala: laager riba, paneel alumise lehena ---------- */
-  #main { display: block; position: relative; height: calc(100% - var(--mob-top)); }
+  #main { display: flex; flex-direction: column; position: relative;
+    height: calc(100% - var(--mob-top)); padding-bottom: var(--mob-tabs); }
 
   #canvas-wrap {
-    height: calc(100% - var(--sheet-peek) - var(--mob-tabs));
-    min-height: 220px;
+    flex: 0 0 27vh;
+    min-height: 150px; max-height: 260px;
     width: 100%;
     border-bottom: 1px solid var(--border);
+    transition: flex-basis .22s ease;
   }
+  #main.camp-min #canvas-wrap { flex-basis: 0; min-height: 0; border-bottom: none; }
   #game-canvas {
     width: 100%; height: 100%;
     max-width: none; max-height: none;
     object-fit: cover;
+    object-position: center 52%;
     flex: 1 1 auto;
   }
 
   /* laagri kihid: väiksemad, aga loetavad */
   #ring-overlay { top: var(--sp-3); right: var(--sp-3); padding: var(--sp-2) var(--sp-3); }
-  #ring-overlay .ringbar label { width: 34px; font-size: 9px; }
-  #ring-overlay .rbar { width: 46px; }
-  #away-overlay { top: var(--sp-3); left: var(--sp-3); font-size: 10px; max-width: 45%; }
+  #ring-overlay { padding: 3px 5px; }
+  #ring-overlay .ringbar { margin: 1px 0; gap: 4px; }
+  #ring-overlay .ringbar label { width: auto; min-width: 22px; font-size: 8px; white-space: nowrap; }
+  #ring-overlay .rbar { width: 34px; height: 6px; }
+  #away-overlay { top: var(--sp-2); left: var(--sp-2); font-size: 9px; max-width: 44%; }
 
   /* logi: kaks viimast rida laagri all servas, puude peale avaneb täislehena */
   #log-overlay {
     left: 0; right: 0; bottom: var(--mob-obj); width: 100%;
-    height: 56px; overflow: hidden;
+    height: 48px; overflow: hidden;
     padding: var(--sp-2) var(--sp-4);
     background: linear-gradient(to top, rgba(20,16,12,.94), rgba(20,16,12,.55) 70%, transparent);
     font-family: Georgia, "Times New Roman", serif;
-    font-size: 13px; line-height: 1.45;
+    font-size: 12.5px; line-height: 1.4;
     display: flex; flex-direction: column; justify-content: flex-end;
     pointer-events: auto;
   }
@@ -121,43 +109,45 @@
 
   /* ---------- alumine leht ---------- */
   #side {
-    position: absolute; left: 0; right: 0; bottom: var(--mob-tabs);
-    width: 100%;
+    position: static;
+    width: 100%; flex: 1 1 auto; min-height: 0;
     border-left: none; border-top: 1px solid var(--accent);
     border-radius: 10px 10px 0 0;
-    box-shadow: 0 -8px 24px rgba(0,0,0,.45);
-    transition: height .22s ease;
-    z-index: 20;
+    box-shadow: 0 -6px 18px rgba(0,0,0,.4);
   }
-  #side { height: var(--sheet-peek); }
-  #side.sheet-half { height: 46vh; }
-  #side.sheet-full { height: calc(100% - var(--mob-top) - 8px); }
 
   #sheet-handle {
-    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    display: flex; align-items: center; justify-content: center; gap: var(--sp-3);
     padding: var(--sp-2) 0 var(--sp-1);
-    cursor: grab; touch-action: none;
+    min-height: 26px; cursor: pointer;
   }
   .sh-grip { display: block; width: 40px; height: 4px; border-radius: 2px; background: var(--border); }
   .sh-label { font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
-  #side.sheet-full .sh-label, #side.sheet-half .sh-label { visibility: hidden; }
+  .sh-label { font-size: 8.5px; }
 
   #tabs { display: none; }              /* vahekaardid liiguvad tegevusribale */
   .tabpage { padding: var(--sp-4); }
 
   /* puutealad: 44px miinimum */
-  .prow { padding: var(--sp-3) var(--sp-4); margin-bottom: var(--sp-3); }
-  .prow .pctrl { gap: var(--sp-3); margin-top: var(--sp-3); }
+  /* inimese kaart: kaks rida, ~poole madalam kui enne */
+  .prow { padding: var(--sp-2) var(--sp-3); margin-bottom: var(--sp-2); }
+  .prow .phead { gap: var(--sp-2); }
+  .prow .pname { font-size: 13.5px; }
+  .prow .page { font-size: 10px; }
+  .prow .hbar { width: 42px; height: 5px; }
+  .prow .pctrl { gap: var(--sp-2); margin-top: var(--sp-2); flex-wrap: nowrap; align-items: center; }
   .prow select {
-    min-height: 44px; font-size: 14px; padding: 0 var(--sp-3);
-    max-width: none; flex: 1 1 auto; border-radius: 3px;
+    min-height: 38px; font-size: 12.5px; padding: 0 var(--sp-2);
+    max-width: none; flex: 1 1 0; min-width: 0; border-radius: 3px;
   }
+  .prow .skill { font-size: 10px; flex: none; }
   .prow label.far {
-    display: inline-flex; align-items: center; gap: var(--sp-3);
-    min-height: 44px; font-size: 13px;
+    display: inline-flex; align-items: center; gap: 5px;
+    min-height: 38px; font-size: 0; flex: none; padding-right: 2px;
   }
-  .prow label.far input { width: 22px; height: 22px; }
-  .prow .pname { font-size: 15px; }
+  .prow label.far input { width: 20px; height: 20px; margin: 0; }
+  .prow label.far::after { content: "⇥"; font-size: 13px; color: var(--dim); }
+  .prow .tags { font-size: 10px; margin-top: 2px; line-height: 1.3; }
 
   .bldrow, .act, .sitecard { padding: var(--sp-4); margin-bottom: var(--sp-3); }
   .bldrow button, .act button, .sitecard button, #btn-ration, #btn-clothes {
@@ -168,7 +158,7 @@
 
   /* ---------- tegevusriba ---------- */
   #mob-tabs {
-    display: grid; grid-template-columns: repeat(5, 1fr);
+    display: grid; grid-template-columns: repeat(4, 1fr);
     position: fixed; left: 0; right: 0; bottom: 0;
     height: var(--mob-tabs);
     background: var(--panel); border-top: 1px solid var(--border);
@@ -184,7 +174,7 @@
   #mob-tabs button .mt-ico { font-size: 15px; line-height: 1; }
   #mob-tabs button.active { color: var(--accent); background: var(--panel2); }
   #mob-tabs button:hover { color: var(--accent); }
-  #mt-speed .mt-lab { font-variant-numeric: tabular-nums; }
+  #mob-tabs #mt-speed { display: none; }
 
   /* ---------- logi täisvaade ---------- */
   #log-full {
@@ -240,6 +230,10 @@
 /* Kitsam telefon: laager 300px, mõõdikutest ainult turvatunne */
 @media (max-width: 380px) {
   :root { --sheet-peek: 116px; }
-  #m-sec .meter label { display: none; }
-  #tb-res { font-size: 12px; gap: 10px; }
+  #canvas-wrap { height: 24vh; min-height: 132px; }
+  #tb-res { font-size: 11px; gap: 9px; }
+  #tb-meters { gap: var(--sp-2) var(--sp-3); }
+  .meter label { font-size: 8px; }
+  .meter .bar { width: 28px; }
+  #tb-speed .spd { min-width: 30px; font-size: 9px; }
 }

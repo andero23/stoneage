@@ -287,8 +287,11 @@ const UI = {
 
   refreshRings() {
     const site = Sim.curSite();
+    const short = typeof Mobile !== "undefined" && Mobile.on;
     for (let r = 0; r < 3; r++) {
       const el = this.$("rb-" + r);
+      const lab = el.querySelector("label");
+      if (lab) lab.textContent = short ? "R" + (r + 1) : "Ring " + (r + 1);
       const frac = site.max[r] > 0 ? site.points[r] / site.max[r] : 0;
       const fill = el.querySelector(".rfill");
       fill.style.width = Math.round(frac * 100) + "%";
