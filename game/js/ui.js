@@ -421,12 +421,10 @@ const UI = {
           }
           const kl = Person.skill(p, "kor");
           const pr = Math.round(DATA.POISON.seened.risk[kl] * 100 * 10) / 10;
-          const dp = (Sim.hasShaman() ? DATA.POISON.seened.deathShaman : DATA.POISON.seened.death) * DATA.POISON_HEALTH_MULT(p.health);
-          const dr = Math.round((1 - Math.pow(1 - DATA.POISON.seened.risk[kl] * dp, 30)) * 100);
           msel.title = "Marjad: ohutu ja etteaimatav.\n" +
-            "Seened: toovad rohkem kui marjad, aga MÜRGIOHT — " + pr + "% päevas, " +
-            "surmarisk hooaja jooksul ~" + dr + "%" + (Sim.hasShaman() ? " (šamaan ravib)" : " (ilma šamaanita!)") +
-            ". Oskus vähendab riski järsult; nõrk inimene sureb mürgist kergemini kui terve.\n" +
+            "Seened: toovad rohkem kui marjad, aga MÜRGIOHT — tema oskusega jõuab vale seen ühisesse patta " + pr + "% päevas. " +
+            "Haigestub JUHUSLIK sööja (ka laps); surm sõltub sööja tervisest" + (Sim.hasShaman() ? " ja šamaan ravib" : " — ja šamaani teil pole") + ". " +
+            "Korjaja oskus vähendab riski järsult: teadmine, milline seen on ohutu, on rühma vara.\n" +
             "Juured: talvel ainus korilus. Materjal: ehituseks ja erileidudeks. Kuivatab: värske → kuivatatud (vajab raami).";
           msel.addEventListener("change", () => { p.mode = msel.value; this.refreshAll(true); });
           ctrl.appendChild(msel);

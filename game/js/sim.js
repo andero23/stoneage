@@ -404,11 +404,12 @@ const Sim = {
     extracted[ring] += y;
     G.seasonGain += y;
 
-    // mürgitus
+    // mürgitus: vale saak jõuab ÜHISESSE PATTA — haigestub juhuslik sööja.
+    // Korjaja oskus määrab, kui tihti vale seen üldse koju jõuab.
     const poi = DATA.POISON[mode];
     let risk = poi.risk[lvl];
     if (mode === "seened" && this.relicBearer("seenekorv") === p) risk *= 0.35;
-    if (U.chance(risk)) this.poisonPerson(p, mode, poi);
+    if (U.chance(risk)) this.poisonRandomEater(p, mode, poi);
   },
 
   workHunt(p, lvl, ring, rm, extracted) {
@@ -1145,6 +1146,25 @@ const Sim = {
     p.wound = Math.max(p.wound, days);
     p.away = null;
     this.log(p.name + " on " + why + ": " + days + " päeva töövõimetu. Ta sööb, aga ei tooda.", "bad");
+  },
+
+  // ühine pott: ohver on juhuslik sööja (kohalolijad ja ringitöölised; ka lapsed)
+  poisonRandomEater(gatherer, mode, poi) {
+    const eaters = this.alive().filter(q => !q.away || q.away.type === "ring");
+    const victim = eaters.length ? U.pick(eaters) : gatherer;
+    const days = U.ri(poi.days[0], poi.days[1]);
+    victim.sick = { name: mode + "mürgitus", days };
+    victim.away = null;
+    const deathP = (this.hasShaman() ? poi.deathShaman : poi.death) * DATA.POISON_HEALTH_MULT(victim.health);
+    const blame = victim.id === gatherer.id
+      ? victim.name + " sõi omaenda korjatud vale " + (mode === "seened" ? "seene" : "vilja")
+      : gatherer.name + " tõi koju vale " + (mode === "seened" ? "seene" : "vilja") + " ja " + victim.name + " sõi seda";
+    if (U.chance(deathP)) {
+      this.killPerson(victim, "seenemürgitus");
+      this.log(blame + ". Hommikul ta enam ei ärganud.", "bad");
+    } else {
+      this.log(blame + ": haige " + days + " päeva." + (this.hasShaman() ? " Šamaan valvab tema juures." : ""), "bad");
+    }
   },
 
   poisonPerson(p, mode, poi) {
