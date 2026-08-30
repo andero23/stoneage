@@ -157,7 +157,10 @@ http.createServer((req, res) => {
 
   // staatika
   let p = decodeURIComponent((req.url || "/").split("?")[0]);
-  if (p === "/") p = "/index.html";
+  // avaleht (site/) on juurel; mäng elab /play all
+  if (p === "/" || p === "/index.html") p = "/site/index.html";
+  else if (p === "/play" || p === "/play/") p = "/index.html";
+  else if (p.startsWith("/img/")) p = "/site" + p;
   const file = path.normalize(path.join(ROOT, p));
   if (!file.startsWith(ROOT) || file.includes("data" + path.sep) || p === "/server.js") {
     res.writeHead(404).end();
