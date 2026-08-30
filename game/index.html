@@ -5,7 +5,8 @@
 <title>Kiviaeg — jääda või liikuda</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="stylesheet" href="css/style.css?v=18">
+<link rel="stylesheet" href="css/style.css?v=22">
+<link rel="stylesheet" href="css/mobile.css?v=22">
 </head>
 <body>
 <div id="app">
@@ -40,6 +41,7 @@
       <span id="leave-txt" title="Lahkumise hind: mis jääb maha, kui kolite. Iga ehitis tõstab seda.">⚓ <b id="r-leave">0</b></span>
       <span id="score-txt" title="Skoor koguneb iga elatud hooajaga: rahvaarv, varad, reliikviad, üle elatud talved, võidetud sõjaretked. Surm lõpetab kogumise.">🏆 <b id="r-score">0</b></span>
       <button id="btn-feedback" title="Saada tagasisidet">💬</button>
+      <button id="tb-more" title="Rohkem näitajaid" aria-expanded="false">⌄</button>
     </div>
   </div>
 
@@ -59,6 +61,7 @@
 
     <!-- Side panel -->
     <div id="side">
+      <div id="sheet-handle" aria-hidden="true"><span class="sh-grip"></span><span class="sh-label">tõmba üles</span></div>
       <div id="tabs">
         <button class="tab active" data-tab="rahvas">Rahvas</button>
         <button class="tab" data-tab="kyla">Küla</button>
@@ -72,6 +75,21 @@
     </div>
   </div>
 </div>
+
+<!-- Mobiil: logi täisvaates -->
+<div id="log-full">
+  <div class="lf-head"><b>Sündmuste logi</b><button id="lf-close" aria-label="Sulge">✕</button></div>
+  <div class="lf-body"></div>
+</div>
+
+<!-- Mobiil: tegevusriba -->
+<nav id="mob-tabs" aria-label="Vaated">
+  <button data-mtab="rahvas"><span class="mt-ico">◆</span><span class="mt-lab">Rahvas</span></button>
+  <button data-mtab="kyla"><span class="mt-ico">▣</span><span class="mt-lab">Küla</span></button>
+  <button data-mtab="teod"><span class="mt-ico">✦</span><span class="mt-lab">Teod</span></button>
+  <button data-mtab="kaart"><span class="mt-ico">◇</span><span class="mt-lab">Kaart</span></button>
+  <button id="mt-speed" title="Kiirus"><span class="mt-ico">⏸</span><span class="mt-lab">1×</span></button>
+</nav>
 
 <!-- Modal -->
 <div id="modal-back" class="hidden">
@@ -93,24 +111,26 @@
       <button id="cb-flee" title="Kõik põgenevad. Kaotad saaki ja mainet, aga mitte inimesi.">Põgene</button>
       <button id="cb-auto" title="Lase lahingul ise laheneda.">Lahenda ise</button>
     </div>
+    <button id="cb-confirm">⚔ Ründa</button>
     <div id="combat-log"></div>
   </div>
 </div>
 
-<script src="js/telemetry.js?v=18"></script>
-<script src="js/util.js?v=18"></script>
-<script src="js/data.js?v=18"></script>
-<script src="js/sprites.js?v=18"></script>
-<script src="js/world.js?v=18"></script>
-<script src="js/objectives.js?v=18"></script>
-<script src="js/person.js?v=18"></script>
-<script src="js/sim.js?v=18"></script>
-<script src="js/events.js?v=18"></script>
-<script src="js/combat.js?v=18"></script>
-<script src="js/render.js?v=18"></script>
-<script src="js/bot.js?v=18"></script>
-<script src="js/ui.js?v=18"></script>
-<script src="js/admin.js?v=18"></script>
-<script src="js/main.js?v=18"></script>
+<script src="js/telemetry.js?v=22"></script>
+<script src="js/util.js?v=22"></script>
+<script src="js/data.js?v=22"></script>
+<script src="js/sprites.js?v=22"></script>
+<script src="js/world.js?v=22"></script>
+<script src="js/objectives.js?v=22"></script>
+<script src="js/person.js?v=22"></script>
+<script src="js/sim.js?v=22"></script>
+<script src="js/events.js?v=22"></script>
+<script src="js/combat.js?v=22"></script>
+<script src="js/render.js?v=22"></script>
+<script src="js/bot.js?v=22"></script>
+<script src="js/ui.js?v=22"></script>
+<script src="js/mobile.js?v=22"></script>
+<script src="js/admin.js?v=22"></script>
+<script src="js/main.js?v=22"></script>
 </body>
 </html>

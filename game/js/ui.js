@@ -7,6 +7,7 @@ const UI = {
   autoResume: false,
   selectedSite: null,
   combatSel: null,
+  combatTarget: null,
   lastPeopleRefresh: -1,
 
   $(id) { return document.getElementById(id); },
@@ -64,6 +65,14 @@ const UI = {
     this.$("cb-flee").addEventListener("click", () => { if (G.combat && !G.combat.over) Combat.fleeAll(); });
     this.$("cb-auto").addEventListener("click", () => { if (G.combat && !G.combat.over) Combat.autoResolve(); });
     this.$("combat-canvas").addEventListener("click", e => this.combatClick(e));
+    this.$("cb-confirm").addEventListener("click", () => {
+      if (!G.combat || G.combat.over) return;
+      const sel = G.combat.units.find(u => u.id === this.combatSel);
+      const tgt = G.combat.units.find(u => u.id === this.combatTarget);
+      if (sel && tgt && !sel.acted) Combat.attack(sel, tgt);
+      this.combatTarget = null;
+      this.drawCombat();
+    });
 
     // paneelis toimetamise ajal ei ehitata seda ümber
     this.ptrDown = false;
@@ -272,6 +281,8 @@ const UI = {
     visEl.querySelector(".fill").style.width = vis + "%";
     visEl.querySelector(".fill").style.background = vis < DATA.VIS.RAID_BASE ? "var(--ok)" : vis < 55 ? "#c9a83c" : "var(--danger)";
     visEl.querySelector(".mval").textContent = vis;
+
+    if (typeof Mobile !== "undefined" && Mobile.on) Mobile.syncSpeed();
   },
 
   refreshRings() {
@@ -804,6 +815,7 @@ const UI = {
     T.log("combat", { type: G.combat.type, n: G.combat.initialEnemies });
     G.paused = true;
     this.combatSel = null;
+    this.combatTarget = null;
     this.$("combat-back").classList.remove("hidden");
     const t = { hundid: "Hundid küla juures", haarang: "Öine haarang", tagasitoomine: "Röövretk reliikvia järele" };
     this.$("combat-title").textContent = t[G.combat.type] || "Kokkupõrge";
@@ -830,12 +842,19 @@ const UI = {
 
     if (clicked && clicked.side === "meie") {
       this.combatSel = clicked.id;
+      this.combatTarget = null;
     } else if (sel && clicked && clicked.side === "nemad") {
       if (Combat.dist(sel, clicked) <= Combat.effRange(sel) && !sel.acted) {
-        Combat.attack(sel, clicked);
+        // mobiilis kahes sammus: esimene puude märgib sihtmärgi, kinnitus lööb
+        if (typeof Mobile !== "undefined" && Mobile.on) {
+          this.combatTarget = clicked.id;
+        } else {
+          Combat.attack(sel, clicked);
+        }
       }
     } else if (sel && !clicked) {
       Combat.moveTo(sel, x, y);
+      this.combatTarget = null;
     }
     this.drawCombat();
   },
@@ -909,6 +928,20 @@ const UI = {
       ctx.textAlign = "center";
       ctx.fillText(u.name.slice(0, 8), u.x * T + T / 2, u.y * T + 10);
       ctx.textAlign = "left";
+    }
+
+    // mobiilis valitud sihtmärk: paks punane raam
+    const tgt = this.combatTarget !== null && this.combatTarget !== undefined
+      ? c.units.find(u => u.id === this.combatTarget && u.hp > 0 && !u.fled) : null;
+    if (tgt) {
+      ctx.strokeStyle = "#c9503c"; ctx.lineWidth = 4;
+      ctx.strokeRect(tgt.x * T + 3, tgt.y * T + 3, T - 6, T - 6);
+    }
+    const conf = this.$("cb-confirm");
+    if (conf) {
+      const show = !!(tgt && sel && !c.over);
+      conf.classList.toggle("show", show);
+      if (show) conf.textContent = "⚔ Ründa: " + tgt.name;
     }
 
     // info
