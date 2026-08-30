@@ -4,8 +4,8 @@
 const DATA = {
   DAY_SECONDS: 15,        // 1 päev = 15 s (1× kiirusel)
   SEASON_DAYS: 30,
-  SEASONS: ["kevad", "suvi", "sügis", "talv"],
-  SEASON_IDX: { kevad: 0, suvi: 1, sygis: 2, talv: 3 },
+  SEASONS: ["spring", "summer", "autumn", "winter"],
+  SEASON_IDX: { spring: 0, summer: 1, autumn: 2, winter: 3 },
 
   XP_PER_LEVEL: 400,
   MAX_LEVEL: 3,
@@ -28,6 +28,12 @@ const DATA = {
     jaht:   [1.0, 2.0, 3.2, 4.5],  // oodatav keskmine; tuleb pahmakatena
     materjal: [2.0, 2.6, 3.2, 3.8], // materjaliühikut päevas
   },
+
+  // Jõeta koha identiteet: metsakohad on JAHIMAAD (ulukid väldivad inimeste
+  // jõekoridori) ja kevadel annavad linnupesad-kasemahl korilusele leiba.
+  // Ilma selleta on jõeta koht surmalõks (mõõdetud: 37/40 hukkus).
+  DRY_HUNT_MULT: 1.5,       // jaht jõeta kohas (ka väikesaak: jänesed, laanepüüd)
+  DRY_SPRING_KORILUS: 0.65, // koriluse kevadine põrand jõeta kohas (munad, mahl)
 
   // hooajakordajad [kevad, suvi, sügis, talv]
   SEASON_MOD: {
@@ -135,26 +141,26 @@ const DATA = {
   RING_KNEE: 0.22,
 
   BUILDINGS: {
-    onn:     { name: "Onn",          mat: 20, work: 12, desc: "Talvevari kuuele inimesele. Ilma varjuta talv tapab.", leave: 20, halfBack: false, max: 6 },
-    raam:    { name: "Kuivatusraam", mat: 8,  work: 5,  desc: "Ainus viis toitu talveks säilitada. Mahutab 100 TÜ, kuivatab 8 TÜ päevas.", leave: 8, halfBack: true, max: 8 },
-    pyha:    { name: "Pühapaik",     mat: 10, work: 6,  desc: "Usk, rituaalid, koht reliikviatele. Lahkumisel langeb usk rängalt.", leave: 25, halfBack: false, max: 1 },
-    tookoht: { name: "Töökoht",      mat: 12, work: 6,  desc: "Tööriistade kvaliteedi lagi tõuseb 100-ni. Kõik ametid kiiremad.", leave: 12, halfBack: true, max: 1 },
-    tara:    { name: "Tara",         mat: 25, work: 10, desc: "Okastara huntide ja röövlite vastu. Turvatunne +12.", leave: 10, halfBack: false, max: 1 },
+    onn:     { name: "Hut",          mat: 20, work: 12, desc: "Winter shelter for six. A winter without shelter kills.", leave: 20, halfBack: false, max: 6 },
+    raam:    { name: "Drying rack", mat: 8,  work: 5,  desc: "The only way to keep food for winter. Holds 100, dries 8 a day.", leave: 8, halfBack: true, max: 8 },
+    pyha:    { name: "Shrine",     mat: 10, work: 6,  desc: "Faith, rites, a place for relics. Leaving it breaks faith badly.", leave: 25, halfBack: false, max: 1 },
+    tookoht: { name: "Workshop",      mat: 12, work: 6,  desc: "Tool quality can reach 100. Every trade works faster.", leave: 12, halfBack: true, max: 1 },
+    tara:    { name: "Fence",         mat: 25, work: 10, desc: "Thorn fence against wolves and raiders. Safety +12.", leave: 10, halfBack: false, max: 1 },
   },
 
   JOBS: {
-    korilane: { name: "Korilane", dom: "kor",     desc: "Toit ja materjal. Ohutu, aga nahku ei anna." },
-    kalur:    { name: "Kalur",    dom: "kala",    desc: "Stabiilne toit. Vajab vett. Kevadine kalajooks päästab näljakuudel." },
-    kytt:     { name: "Kütt",     dom: "jaht",    desc: "Toit + nahad. Saak tuleb pahmakas. Riskantne." },
-    sodalane: { name: "Sõdalane", dom: "voit",    desc: "Ei tooda midagi. Turvatunne ja kaitse. Kolm sõdalast avab kaugretke." },
-    meister:  { name: "Meister",  dom: "meister", desc: "Ehitab, valmistab riideid, hoiab tööriistu korras." },
-    skaut:    { name: "Skaut",    dom: "skaut",   desc: "Järgmise laagripaiga info. Ilma skaudita hüppad tundmatusse." },
-    samaan:   { name: "Šamaan",   dom: "vaim",    desc: "Usk, rituaalid, ravi. Ei võitle. Tema surm on kriis." },
+    korilane: { name: "Forager", dom: "kor",     desc: "Food and timber. Safe, but brings no hides." },
+    kalur:    { name: "Fisher",    dom: "kala",    desc: "Steady food. Needs water. The spring run saves the hungry months." },
+    kytt:     { name: "Hunter",     dom: "jaht",    desc: "Food and hides. Comes in bursts. Risky." },
+    sodalane: { name: "Warrior", dom: "voit",    desc: "Produces nothing. Safety and defence. Three warriors open the long raid." },
+    meister:  { name: "Crafter",  dom: "meister", desc: "Builds, makes clothes, keeps tools sharp." },
+    skaut:    { name: "Scout",    dom: "skaut",   desc: "Word of the next campsite. Without a scout you leap blind." },
+    samaan:   { name: "Shaman",   dom: "vaim",    desc: "Faith, rites, healing. Does not fight. Their death is a crisis." },
   },
   JOB_KEYS: ["korilane", "kalur", "kytt", "sodalane", "meister", "skaut", "samaan"],
-  KOR_MODES: { marjad: "marjad", seened: "seened", juured: "juured/koor", materjal: "materjal", kuivatab: "kuivatab toitu" },
+  KOR_MODES: { marjad: "berries", seened: "mushrooms", juured: "roots/bark", materjal: "timber", kuivatab: "drying food" },
 
-  DOM_NAMES: { kor: "korilus", kala: "kalapüük", jaht: "jaht", voit: "võitlus", meister: "meisterdus", skaut: "skautlus", vaim: "vaimutarkus" },
+  DOM_NAMES: { kor: "foraging", kala: "fishing", jaht: "hunting", voit: "fighting", meister: "crafting", skaut: "scouting", vaim: "spirit lore" },
 
   // ringi risk päevas (õnnetus, kiskja, eksimine)
   RING_RISK: [0, 0.006, 0.013],
@@ -166,17 +172,17 @@ const DATA = {
 
   // lahing: [hp, ulatus, tabamis%, dmgLo, dmgHi, liikumine]
   COMBAT: {
-    kytt:     { hp: 8,  range: 5, hit: 0.70, lo: 3, hi: 5, move: 3, wpn: "vibu" },
-    sodalane: { hp: 14, range: 1, hit: 0.75, lo: 4, hi: 6, move: 3, wpn: "nuiakivi" },
-    kalur:    { hp: 10, range: 3, hit: 0.65, lo: 3, hi: 4, move: 3, wpn: "harpuun" },
-    korilane: { hp: 8,  range: 2, hit: 0.50, lo: 1, hi: 2, move: 3, wpn: "kivi" },
-    meister:  { hp: 8,  range: 2, hit: 0.50, lo: 1, hi: 2, move: 3, wpn: "kivi" },
-    skaut:    { hp: 8,  range: 2, hit: 0.55, lo: 1, hi: 3, move: 4, wpn: "kivi" },
-    hunt:     { hp: 6,  range: 1, hit: 0.55, lo: 2, hi: 3, move: 4, wpn: "hambad" },
-    roovel:   { hp: 10, range: 1, hit: 0.68, lo: 3, hi: 5, move: 3, wpn: "kirves" },
-    roovel_oda: { hp: 9, range: 4, hit: 0.62, lo: 3, hi: 5, move: 3, wpn: "oda" },
-    karu:     { hp: 30, range: 1, hit: 0.70, lo: 6, hi: 10, move: 3, wpn: "käpp" },
-    metssiga: { hp: 16, range: 1, hit: 0.65, lo: 4, hi: 7, move: 4, wpn: "kihvad" },
+    kytt:     { hp: 8,  range: 5, hit: 0.70, lo: 3, hi: 5, move: 3, wpn: "bow" },
+    sodalane: { hp: 14, range: 1, hit: 0.75, lo: 4, hi: 6, move: 3, wpn: "stone club" },
+    kalur:    { hp: 10, range: 3, hit: 0.65, lo: 3, hi: 4, move: 3, wpn: "harpoon" },
+    korilane: { hp: 8,  range: 2, hit: 0.50, lo: 1, hi: 2, move: 3, wpn: "stone" },
+    meister:  { hp: 8,  range: 2, hit: 0.50, lo: 1, hi: 2, move: 3, wpn: "stone" },
+    skaut:    { hp: 8,  range: 2, hit: 0.55, lo: 1, hi: 3, move: 4, wpn: "stone" },
+    hunt:     { hp: 6,  range: 1, hit: 0.55, lo: 2, hi: 3, move: 4, wpn: "teeth" },
+    roovel:   { hp: 10, range: 1, hit: 0.68, lo: 3, hi: 5, move: 3, wpn: "axe" },
+    roovel_oda: { hp: 9, range: 4, hit: 0.62, lo: 3, hi: 5, move: 3, wpn: "spear" },
+    karu:     { hp: 30, range: 1, hit: 0.70, lo: 6, hi: 10, move: 3, wpn: "paw" },
+    metssiga: { hp: 16, range: 1, hit: 0.65, lo: 4, hi: 7, move: 4, wpn: "tusks" },
   },
 
   KAUGRETK: { days: 12, minWar: 3, minHunt: 3, minPop: 16, baseTU: 200, perSkillTU: 66,
@@ -190,23 +196,23 @@ const DATA = {
   RITUAL_COOLDOWN: 15,
   RITUAL_DAYS: 15,          // rituaali mõju kestus
   RITUAL_TYPES: ["jahionn", "kalaonn", "kaitse", "tervendus"],
-  RITUAL_NAMES: { jahionn: "Jahiõnne rituaal", kalaonn: "Kalaõnne rituaal", kaitse: "Kaitserituaal", tervendus: "Tervendusrituaal" },
+  RITUAL_NAMES: { jahionn: "Rite of the hunt", kalaonn: "Rite of the catch", kaitse: "Warding rite", tervendus: "Healing rite" },
 
   // reliikviad
   RELICS: {
-    peakate:  { name: "Sarvedega peakate", job: "kytt",     desc: "Punahirve kolju, sarved küljes. Kandes on ta keegi teine." },
-    karukapp: { name: "Karu käpp",         job: "sodalane", desc: "Vastased kõhklevad. Tema ei kõhkle." },
-    merevaik: { name: "Merevaikkivi",      job: "samaan",   desc: "Kivi, mis on tulnud kaugemalt kui ükski elav inimene." },
-    tuum:     { name: "Sirge tulekivituum", job: "meister", desc: "Kivi, mis annab järele just sealt, kust vaja." },
-    seenekorv:{ name: "Vanaema seenekorv", job: "korilane", desc: "Punutis, mis mäletab, mida vanaema teadis." },
-    harpuun:  { name: "Luust harpuuniots", job: "kalur",    desc: "Vees ei eksi see kunagi." },
-    jalaluu:  { name: "Rändaja jalaluu",   job: "skaut",    desc: "Luu inimeselt, kes ei jäänud kunagi paigale." },
-    ehe:      { name: "Esimese lapse ehe", job: null,       desc: "Merikarbist ripats. Ei aita millegagi. Ja ometi." },
+    peakate:  { name: "Antlered headdress", job: "kytt",     desc: "A red deer skull, antlers still on. Wearing it, he is someone else." },
+    karukapp: { name: "Bear's paw",         job: "sodalane", desc: "His enemies hesitate. He does not." },
+    merevaik: { name: "Amber stone",      job: "samaan",   desc: "A stone that came from further than any living person." },
+    tuum:     { name: "True flint core", job: "meister", desc: "A stone that gives way exactly where it should." },
+    seenekorv:{ name: "Grandmother's basket", job: "korilane", desc: "Woven work that remembers what grandmother knew." },
+    harpuun:  { name: "Bone harpoon head", job: "kalur",    desc: "In water it never loses its way." },
+    jalaluu:  { name: "Wanderer's legbone",   job: "skaut",    desc: "A bone from someone who never stayed anywhere." },
+    ehe:      { name: "First child's pendant", job: null,       desc: "A seashell pendant. It helps with nothing. And still." },
   },
 
   RICHNESS: { vaene: 30, keskmine: 60, rikas: 100 },
-  RICHNESS_NAME: r => r >= 90 ? "rikas" : r >= 50 ? "keskmine" : "vaene",
-  LEVEL_NAME: v => v >= 67 ? "hea" : v >= 34 ? "keskmine" : "kehv",
+  RICHNESS_NAME: r => r >= 90 ? "rich" : r >= 50 ? "fair" : "poor",
+  LEVEL_NAME: v => v >= 67 ? "good" : v >= 34 ? "fair" : "poor",
 
   SEC_REQ_PER_POP: 3,
   LEAVE_THRESHOLD: 25,

@@ -477,7 +477,7 @@ const UI = {
 
     html += '<div class="sechead">' + site.name + " — " + DATA.RICHNESS_NAME(site.rich) + " paik</div>";
     html += '<div class="bdesc" style="font-size:12px;color:var(--dim);line-height:1.4;margin-bottom:6px">' +
-      (site.river ? "Jõgi annab kala. " : "Vett on vähe: kalapüük kehv. ") +
+      (site.river ? "Jõgi annab kala. " : "Kalapüük kehv, aga METSAD ON JAHIRIKKAD ja kevadel toidavad linnupesad. ") +
       (site.cave ? "Koobas: peavarju 12 inimesele tasuta. " : "") +
       (site.fishRun ? "KALAJOOKSU KOHT: kevadel erakordne püük. " : "") +
       "Varjatus: " + DATA.LEVEL_NAME(site.hidden || 0) + " · kaitstavus: " + DATA.LEVEL_NAME(site.defensible || 0) + ". " +

@@ -398,7 +398,9 @@ const Sim = {
       }
       return;
     }
-    const smod = mode === "juured" ? DATA.SEASON_MOD.juured[G.season] : DATA.SEASON_MOD.korilus[G.season];
+    let smod = mode === "juured" ? DATA.SEASON_MOD.juured[G.season] : DATA.SEASON_MOD.korilus[G.season];
+    // jõeta kohas päästab kevade mets: linnupesad, munad, kasemahl
+    if (G.season === 0 && !this.curSite().river) smod = Math.max(smod, DATA.DRY_SPRING_KORILUS);
     let y = DATA.YIELD[mode][lvl] * smod * rm * this.yieldRoll();
     this.addFresh(y);
     extracted[ring] += y;
@@ -413,10 +415,12 @@ const Sim = {
   },
 
   workHunt(p, lvl, ring, rm, extracted) {
-    const EV = DATA.YIELD.jaht[lvl] * DATA.SEASON_MOD.jaht[G.season] * rm * this.buffMod("jahionn", 1.12);
-    // väikesaak
+    // metsakohad (jõeta) on jahimaad: ulukid väldivad inimeste jõekoridori
+    const dryMult = this.curSite().river ? 1 : DATA.DRY_HUNT_MULT;
+    const EV = DATA.YIELD.jaht[lvl] * DATA.SEASON_MOD.jaht[G.season] * rm * dryMult * this.buffMod("jahionn", 1.12);
+    // väikesaak (metsakohas rikkalikum: jänesed, laanepüüd)
     if (U.chance(0.55)) {
-      const y = U.rf(0.7, 1.5);
+      const y = U.rf(0.7, 1.5) * dryMult;
       this.addFresh(y);
       extracted[ring] += y;
       G.seasonGain += y;

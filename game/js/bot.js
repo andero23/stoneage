@@ -73,9 +73,15 @@ const Bot = {
         if (m && site.b.raam >= 1) { m.job = "korilane"; m.mode = "marjad"; }
       }
     }
-    // jõeta kohas on kalur kasutu
+    // jõeta kohas on kalur kasutu — aga metsad on jahirikkad: kalurid küttideks,
+    // ja hoia vähemalt 2 kütti (jahimaa identiteet)
     if (!site.river) {
-      for (const p of adults.filter(p => p.job === "kalur")) { p.job = "korilane"; p.mode = "marjad"; }
+      for (const p of adults.filter(p => p.job === "kalur")) { p.job = "kytt"; }
+      const hunters2 = adults.filter(p => p.job === "kytt").length;
+      if (hunters2 < 2 && adults.length >= 4) {
+        const c = adults.find(p => p.job === "korilane" && p.mode === "marjad" && Person.canWork(p) && !p.away);
+        if (c) c.job = "kytt";
+      }
     } else if (g.season === 0) {
       const fishers = adults.filter(p => p.job === "kalur").length;
       if (fishers < 2 && pop >= 6) {
