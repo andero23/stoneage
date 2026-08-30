@@ -19,10 +19,7 @@ const UI = {
     Bridge.onCombat = () => this.openCombat();
     Bridge.onCombatEnd = () => this.closeCombat();
     Bridge.onStateChange = () => this.refreshAll();
-    Bridge.onRestart = () => {
-      this.$("start-back").style.display = "flex";
-      this.showContinueIfSaved();
-    };
+    Bridge.onRestart = () => this.newGame();
     Bridge.onRecord = () => {
       this.saveRecord();
       T.log("game_over", { score: Math.round(G.score), ...T.snapshot() });
@@ -73,11 +70,9 @@ const UI = {
     this.$("side").addEventListener("pointerdown", () => { this.ptrDown = true; });
     window.addEventListener("pointerup", () => { this.ptrDown = false; });
 
-    // algusekraan
-    this.$("btn-new").addEventListener("click", () => this.newGame());
-    this.$("btn-help2").addEventListener("click", () => { this.showHelp(); });
-    this.$("btn-continue").addEventListener("click", () => this.loadGame());
-    this.showContinueIfSaved();
+    // Mäng algab kohe: pooleliolev partii jätkub, muidu algab uus.
+    // Vaheekraane ega juhendit ei ole — mäng peab seletama end ise.
+    if (!this.loadGame()) this.newGame();
 
     const objHide = this.$("obj-hide");
     if (objHide) objHide.addEventListener("click", e => {
@@ -113,15 +108,6 @@ const UI = {
     try { return JSON.parse(localStorage.getItem("kiviaeg-records") || "[]"); } catch (e) { return []; }
   },
 
-  showContinueIfSaved() {
-    let has = false;
-    try { has = !!localStorage.getItem("kiviaeg-save"); } catch (e) { has = false; }
-    this.$("btn-continue").classList.toggle("hidden", !has);
-    const recs = this.records();
-    const el = this.$("start-record");
-    if (el) el.textContent = recs.length ? "Parim skoor: " + recs[0].score + " (" + recs[0].years + " aastat)" : "";
-  },
-
   clearModals() {
     this.modalQueue = [];
     this.modalOpen = false;
@@ -135,20 +121,8 @@ const UI = {
     this.clearModals();
     Sim.newGame(seed);
     T.newGame(seed, false);
-    this.$("start-back").style.display = "none";
-    G.paused = true;
+    G.paused = false;
     this.refreshAll(true);
-    this.queueModal({
-      title: "Esimene suvi",
-      body: "Teid on viis: neli täiskasvanut ja üks laps. Suvi on küllus — korja, õpi, vaata ringi.\n\n" +
-        "• RAHVAS: määra igaühele amet. Korilased toovad toitu, kalur püüab jõest, kütt toob nahku (ilma nahkadeta külmute talvel).\n" +
-        "• KÜLA: ehita kuivatusraam enne sügist — värske toit rikneb kuue päevaga, talveks säilib ainult kuivatatu.\n" +
-        "• KAART: skaut uurib teisi laagripaiku. Ümbrus AMMENDUB — ükski koht ei kanna igavesti.\n" +
-        "• Kevadel ja sügise alguses saab KOLIDA. Iga ehitis teeb lahkumise kallimaks.\n\n" +
-        "Tühik = paus. Alusta rahulikult, 1× kiirusel.",
-      choices: [{ label: "Alustame", fx: () => {} }],
-      def: 0,
-    });
   },
 
   saveGame() {
@@ -161,11 +135,11 @@ const UI = {
   loadGame() {
     try {
       const g = JSON.parse(localStorage.getItem("kiviaeg-save"));
-      if (!g || !g.people) return;
+      if (!g || !g.people || g.over) return false;
       G = g;
       U.setSeed((g.seed + g.day * 7919) >>> 0);
       Person.usedNames = new Set(G.people.map(p => p.name));
-      G.paused = true;
+      G.paused = false;
       G.combat = null;
       G.suurjaht = G.suurjaht || null;
       // vanade salvestuste migratsioon: koha omadused, isikuomadused
@@ -176,29 +150,11 @@ const UI = {
       for (const pp of G.people) if (!pp.traits) pp.traits = Person.rollTraits();
       Objectives.migrate();
       this.clearModals();
-      this.$("start-back").style.display = "none";
       this.refreshAll(true);
       T.newGame(G.seed, true);
-      Sim.log("Mäng laaditud. Tuli põleb edasi.", "evt");
-    } catch (e) { console.error(e); }
-  },
-
-  showHelp() {
-    T.log("help", {});
-    this.queueModal({
-      title: "Kuidas mängida",
-      body:
-        "AEG: 1 päev = 15 s. Aasta = 4 hooaega à 30 päeva. Kiirust valid ise (1/2/3 või nupud) — ka talvel jätkub tööd: ehitamine, materjal, juured, talvejaht.\n\n" +
-        "TOIT: iga täiskasvanu sööb 1 TÜ päevas, laps pool. Värske toit rikneb ~6 päevaga. Kuivatusraam + keegi kuivatamas = talvevaru.\n\n" +
-        "AMMENDUMINE: iga laagripaik on piiratud. Ring 1 tühjeneb esimesena, siis käiakse kaugemal (ring 2–3): aeglasem, ohtlikum, ja rünnaku ajal on need inimesed kodust ära. Mujal maa taastub aegamisi.\n\n" +
-        "OSKUSED: töö õpetab. Kaugemal töötamine õpetab kiiremini (ring 2 = 2×, ring 3 = 3×, uus laagripaik = 3× esimesel hooajal). Mugav elu ei õpeta. Kogenu + algaja samas ametis = õpipaar.\n\n" +
-        "NAHAD tulevad ainult jahilt. Meister õmbleb neist talveriided (2 nahka tk).\n\n" +
-        "JÄÄDA VÕI LIIKUDA: kolida saab kevadel (terve hooaja) ja sügise alguses (15 päeva). Iga ehitis tõstab lahkumise hinda. Ükski koht ei kanna igavesti — aga teekond võib tappa.\n\n" +
-        "USK on puhver: kõrge usuga talutakse nälga ja surma. Maine toob liitujaid, kauplejaid — ja röövleid.\n\n" +
-        "16 inimest + 3 sõdalast + 3 kütti = KAUGRETK: 12 päeva, palju toitu, ei ammenda kodu ümbrust. See on suure hõimu ellujäämise võti.",
-      choices: [{ label: "Selge", fx: () => {} }],
-      def: 0,
-    });
+      Sim.log("Tuli põleb edasi. Mäng jätkub sealt, kus pooleli jäi.", "evt");
+      return true;
+    } catch (e) { console.error(e); return false; }
   },
 
   // ---------- logi ----------
