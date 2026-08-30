@@ -12,7 +12,8 @@ const DATA_DIR = path.join(ROOT, "data");
 const PORT = /^\d+$/.test(process.argv[2] || "") ? parseInt(process.argv[2]) : parseInt(process.env.PORT || "8125");
 const MIME = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8",
   ".css": "text/css; charset=utf-8", ".json": "application/json", ".png": "image/png",
-  ".md": "text/plain; charset=utf-8", ".ico": "image/x-icon" };
+  ".md": "text/plain; charset=utf-8", ".ico": "image/x-icon",
+  ".svg": "image/svg+xml" };
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
 
