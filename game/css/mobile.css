@@ -108,6 +108,10 @@
     max-width: none; right: 0;
   }
 
+  /* riba peidetud (✕, eesmärk täidetud või eesmärki pole) — logi laskub
+     laagri alumisse serva, muidu jääks sinna riba-kõrgune tühi tükk */
+  #canvas-wrap:has(#obj-bar.hidden) #log-overlay { bottom: 0; }
+
   /* ---------- alumine leht ---------- */
   #side {
     position: static;
