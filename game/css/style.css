@@ -74,7 +74,8 @@ b { color: #fff; }
 #log-overlay .logline.evt { color: var(--accent); }
 #log-overlay .logline.bad { color: #e06a55; }
 #log-overlay .logline.good { color: #a5c97a; }
-#ring-overlay { position: absolute; right: 8px; top: 8px; background: rgba(20,16,12,0.75); padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; }
+#ring-overlay { position: absolute; right: 8px; top: 8px; background: rgba(20,16,12,0.75); padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; cursor: pointer; }
+#ring-overlay:hover { border-color: var(--accent); }
 .ringbar { display: flex; align-items: center; gap: 6px; margin: 2px 0; }
 .ringbar label { font-size: 10px; color: var(--dim); width: 40px; }
 .rbar { width: 70px; height: 8px; background: #0b0805; border: 1px solid var(--border); }

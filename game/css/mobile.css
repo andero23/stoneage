@@ -78,7 +78,7 @@
 
   /* laagri kihid: väiksemad, aga loetavad */
   #ring-overlay { top: var(--sp-3); right: var(--sp-3); padding: var(--sp-2) var(--sp-3); }
-  #ring-overlay { padding: 3px 5px; }
+  #ring-overlay { padding: 5px 7px; min-width: 76px; }
   #ring-overlay .ringbar { margin: 1px 0; gap: 4px; }
   #ring-overlay .ringbar label { width: auto; min-width: 22px; font-size: 8px; white-space: nowrap; }
   #ring-overlay .rbar { width: 34px; height: 6px; }

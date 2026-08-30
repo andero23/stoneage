@@ -74,6 +74,9 @@ const UI = {
       this.drawCombat();
     });
 
+    // ringiribad: klõps avab selgituse (tooltip ei tööta puuteekraanil)
+    this.$("ring-overlay").addEventListener("click", () => this.showRings());
+
     // paneelis toimetamise ajal ei ehitata seda ümber
     this.ptrDown = false;
     this.$("side").addEventListener("pointerdown", () => { this.ptrDown = true; });
@@ -164,6 +167,36 @@ const UI = {
       Sim.log("Tuli põleb edasi. Mäng jätkub sealt, kus pooleli jäi.", "evt");
       return true;
     } catch (e) { console.error(e); return false; }
+  },
+
+  // Ringide selgitus: mida kaugus tähendab saagile, kogemusele ja ohule.
+  showRings() {
+    if (!G || G.over) return;
+    const site = Sim.curSite();
+    const auto = World.autoRing(site);
+    const pct = r => Math.round((site.max[r] > 0 ? site.points[r] / site.max[r] : 0) * 100);
+    const names = ["Ring 1 — küla ümber", "Ring 2 — päeva tee kaugusel", "Ring 3 — kaugmets"];
+    const desc = [
+      "Ohutu. Käik võtab ühe päeva ja rünnaku ajal on rahvas kodus. Ammendub esimesena.",
+      "Saak " + Math.round(DATA.RING_MOD[1] * 100) + "% ja kogemust " + DATA.RING_XP[1] + "× kiiremini. " +
+        "Käik võtab kaks päeva — rünnaku ajal ei jõua need inimesed koju. Hundid ja metssead.",
+      "Saak " + Math.round(DATA.RING_MOD[2] * 100) + "%, aga kogemust " + DATA.RING_XP[2] + "× kiiremini. " +
+        "Karu, hundikari, võõrad ja eksimine. Siin võib inimene ka päriselt kaduma jääda.",
+    ];
+    let body = "Ümbrus ammendub seestpoolt välja. Iga ring on eraldi varu: kui lähim tühjeneb, " +
+      "käiakse kaugemal — aeglasemalt, ohtlikumalt, aga seal õpitakse rohkem.\n\n";
+    for (let r = 0; r < 3; r++) {
+      body += names[r] + " — alles " + pct(r) + "%" + (r === auto ? "  ← siin käiakse täna" : "") + "\n" +
+        desc[r] + "\n\n";
+    }
+    body += "Mugav elu ei õpeta: rühm, kes istub rikkas kohas ringis 1, kasvab suureks ja jääb rumalaks. " +
+      "Üksiku inimese saab saata kaugemale Rahva-vahekaardi ringi-nupuga.";
+    this.queueModal({
+      title: "Ringid ümber laagri",
+      body,
+      choices: [{ label: "Selge", fx: () => {} }],
+      def: 0,
+    });
   },
 
   // ---------- logi ----------
